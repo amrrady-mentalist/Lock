@@ -31,7 +31,6 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: #000000;
             overscroll-behavior: none !important;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         body {
@@ -39,6 +38,8 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            /* Added padding-top to account for the transparent status bar overlay */
+            padding: calc(24px + env(safe-area-inset-top)) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         .view {
@@ -178,12 +179,12 @@
             will-change: background-color, box-shadow, transform;
         }
 
-        /* RE-IMPLEMENTED HIGH-CONTRAST GLOW FEEDBACK EFFECT */
-        .key:active {
+        /* JAVASCRIPT TRIGGERED HIGH-CONTRAST GLOW CLASS */
+        .key.glowing {
             transform: scale(0.90);
             background-color: rgba(255, 255, 255, 0.35) !important;
-            border-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.8) !important;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.3) !important;
         }
 
         .bottom-side-space {
@@ -206,7 +207,7 @@
             will-change: opacity, transform;
         }
 
-        .action-label-btn:active {
+        .action-label-btn.glowing-action {
             transform: scale(0.92);
             opacity: 0.5;
         }
@@ -363,37 +364,28 @@
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        /* SYSTEM-SAFE DIRECT ACCESSIBILITY PHOTO TRIGGER SELECTION SYSTEM */
+        /* NATIVE STORAGE INTERACTION ROW */
         .native-system-gallery-row {
             background: #11111e;
             border: 1px dashed #3f3f74;
             border-radius: 8px;
-            padding: 12px;
+            padding: 16px;
             margin-bottom: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            cursor: pointer;
         }
 
         .gallery-helper-prompt {
-            font-size: 12px !important;
+            font-size: 13px !important;
             color: #8fa0ff !important;
             text-transform: none !important;
             letter-spacing: 0px !important;
             margin-bottom: 2px !important;
             text-align: center;
-        }
-
-        .native-system-gallery-row input[type="file"] {
-            width: 100% !important;
-            background: transparent !important;
-            border: none !important;
-            color: #ffffff !important;
-            font-size: 14px !important;
-            cursor: pointer;
-            padding: 4px 0;
-            user-select: none !important;
+            font-weight: 600;
         }
 
         .url-input-container {
@@ -485,24 +477,24 @@
 
         <div class="keypad-container">
             <div class="keypad-row">
-                <div class="key" ontouchstart="pressNum('1')" onmousedown="pressNum('1')">1</div>
-                <div class="key" ontouchstart="pressNum('2')" onmousedown="pressNum('2')">2</div>
-                <div class="key" ontouchstart="pressNum('3')" onmousedown="pressNum('3')">3</div>
+                <div class="key" data-val="1">1</div>
+                <div class="key" data-val="2">2</div>
+                <div class="key" data-val="3">3</div>
             </div>
             <div class="keypad-row">
-                <div class="key" ontouchstart="pressNum('4')" onmousedown="pressNum('4')">4</div>
-                <div class="key" ontouchstart="pressNum('5')" onmousedown="pressNum('5')">5</div>
-                <div class="key" ontouchstart="pressNum('6')" onmousedown="pressNum('6')">6</div>
+                <div class="key" data-val="4">4</div>
+                <div class="key" data-val="5">5</div>
+                <div class="key" data-val="6">6</div>
             </div>
             <div class="keypad-row">
-                <div class="key" ontouchstart="pressNum('7')" onmousedown="pressNum('7')">7</div>
-                <div class="key" ontouchstart="pressNum('8')" onmousedown="pressNum('8')">8</div>
-                <div class="key" ontouchstart="pressNum('9')" onmousedown="pressNum('9')">9</div>
+                <div class="key" data-val="7">7</div>
+                <div class="key" data-val="8">8</div>
+                <div class="key" data-val="9">9</div>
             </div>
             <div class="keypad-row">
-                <div class="bottom-side-space action-label-btn" id="action-ok-btn" ontouchstart="handleActionKey()" onmousedown="handleActionKey()">OK</div>
-                <div class="key" ontouchstart="pressNum('0')" onmousedown="pressNum('0')">0</div>
-                <div class="bottom-side-space action-label-btn" id="action-key-btn" ontouchstart="backspace(event)" onmousedown="backspace(event)">Delete</div>
+                <div class="bottom-side-space action-label-btn" id="action-ok-btn">OK</div>
+                <div class="key" data-val="0">0</div>
+                <div class="bottom-side-space action-label-btn" id="action-key-btn">Delete</div>
             </div>
         </div>
     </div>
@@ -523,9 +515,8 @@
 
         <div class="settings-group">
             <label>1. Lock Screen Background</label>
-            <div class="native-system-gallery-row">
-                <span class="gallery-helper-prompt">👇 Tap below to look through your storage photo gallery:</span>
-                <input type="file" accept="image/*" onchange="handleImageUpload(event, 'lock')">
+            <div class="native-system-gallery-row" onclick="openNativeSystemGalleryPicker('lock')">
+                <span class="gallery-helper-prompt">🖼️ Choose from Gallery</span>
             </div>
             
             <div class="url-input-container">
@@ -541,9 +532,8 @@
 
         <div class="settings-group">
             <label>2. Home Screen Screenshot Image</label>
-            <div class="native-system-gallery-row">
-                <span class="gallery-helper-prompt">👇 Tap below to look through your storage photo gallery:</span>
-                <input type="file" accept="image/*" onchange="handleImageUpload(event, 'homescreen')">
+            <div class="native-system-gallery-row" onclick="openNativeSystemGalleryPicker('homescreen')">
+                <span class="gallery-helper-prompt">🖼️ Choose from Gallery</span>
             </div>
             
             <div class="url-input-container">
@@ -607,6 +597,8 @@
         </div>
     </div>
 
+    <!-- Include Cordova scripts to handle native hooks -->
+    <script src="cordova.js"></script>
     <script>
         let currentInput = "";
         let targetPin = localStorage.getItem("app_pin") || "1234";
@@ -655,40 +647,115 @@
         const peekPopup = document.getElementById("peek-popup");
         const resetTouchZone = document.getElementById("reset-touch-zone");
 
+        // Cordova Initialization Engine
+        document.addEventListener("deviceready", onDeviceReady, false);
+
+        function onDeviceReady() {
+            // Apply absolute transparency configuration to the status bar natively
+            if (window.StatusBar) {
+                window.StatusBar.overlaysWebView(true);
+                window.StatusBar.backgroundColorByHexString('#00000000');
+                window.StatusBar.styleLightContent();
+            }
+            if (window.NavigationBar) {
+                window.NavigationBar.backgroundColorByHexString('#000000');
+            }
+        }
+
+        // Native System Camera/Gallery Pipeline Setup
+        function openNativeSystemGalleryPicker(modeKey) {
+            if (!navigator.camera) {
+                alert("Platform waiting for hardware bridge initialization. Make sure this is running as an installed app build!");
+                return;
+            }
+
+            const cameraOptions = {
+                quality: 90,
+                destinationType: Camera.DestinationType.DATA_URL,
+                sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
+                mediaType: Camera.MediaType.PICTURE,
+                encodingType: Camera.EncodingType.JPEG,
+                correctOrientation: true
+            };
+
+            navigator.camera.getPicture(
+                function(base64Data) {
+                    const completeBase64Str = "data:image/jpeg;base64," + base64Data;
+                    processImageStorageState(completeBase64Str, modeKey);
+                },
+                function(failError) {
+                    console.log("Gallery retrieval skipped or failed: " + failError);
+                }, 
+                cameraOptions
+            );
+        }
+
+        // HIGH-SPEED HARDWARE ACCELERATED TOUCH EVENTS IMPLEMENTATION FOR KEYPAD GLOW EFFECT
+        function initializeHighSpeedKeypadListeners() {
+            const digitKeys = document.querySelectorAll('.key');
+            digitKeys.forEach(keyBtn => {
+                const triggerPress = function(e) {
+                    e.preventDefault();
+                    keyBtn.classList.add('glowing');
+                    const value = keyBtn.getAttribute('data-val');
+                    if (value !== null) {
+                        pressNum(value);
+                    }
+                };
+
+                const releasePress = function(e) {
+                    e.preventDefault();
+                    keyBtn.classList.remove('glowing');
+                };
+
+                keyBtn.addEventListener('touchstart', triggerPress, { passive: false });
+                keyBtn.addEventListener('touchend', releasePress, { passive: false });
+                keyBtn.addEventListener('mousedown', triggerPress);
+                keyBtn.addEventListener('mouseup', releasePress);
+                keyBtn.addEventListener('mouseleave', releasePress);
+            });
+
+            // Set up Delete Action Label Layout Button Hooks
+            if (actionKeyBtn) {
+                const triggerDel = function(e) {
+                    e.preventDefault();
+                    actionKeyBtn.classList.add('glowing-action');
+                    backspace();
+                };
+                const releaseDel = function(e) {
+                    e.preventDefault();
+                    actionKeyBtn.classList.remove('glowing-action');
+                };
+                actionKeyBtn.addEventListener('touchstart', triggerDel, { passive: false });
+                actionKeyBtn.addEventListener('touchend', releaseDel, { passive: false });
+                actionKeyBtn.addEventListener('mousedown', triggerDel);
+                actionKeyBtn.addEventListener('mouseup', releaseDel);
+            }
+
+            // Set up OK Action Label Layout Button Hooks
+            if (actionOkBtn) {
+                const triggerOk = function(e) {
+                    e.preventDefault();
+                    actionOkBtn.classList.add('glowing-action');
+                    handleActionKey();
+                };
+                const releaseOk = function(e) {
+                    e.preventDefault();
+                    actionOkBtn.classList.remove('glowing-action');
+                };
+                actionOkBtn.addEventListener('touchstart', triggerOk, { passive: false });
+                actionOkBtn.addEventListener('touchend', releaseOk, { passive: false });
+                actionOkBtn.addEventListener('mousedown', triggerOk);
+                actionOkBtn.addEventListener('mouseup', releaseOk);
+            }
+        }
+
         function parseCaptureConfig(inputStr) {
             if (!inputStr) return [1];
             return inputStr.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
         }
 
-        function triggerStrictImmersiveMode() {
-            try {
-                const doc = window.document;
-                const docEl = doc.documentElement;
-                
-                if (window.StatusBar) {
-                    window.StatusBar.hide();
-                    window.StatusBar.overlaysWebView(true);
-                }
-                
-                const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-                if (requestFullScreen) {
-                    requestFullScreen.call(docEl, { navigationUI: "hide" }).catch(err => {});
-                }
-            } catch (e) {}
-        }
-
-        document.addEventListener("DOMContentLoaded", triggerStrictImmersiveMode, { passive: true });
-        document.onreadystatechange = function () {
-            if (document.readyState === "interactive" || document.readyState === "complete") {
-                triggerStrictImmersiveMode();
-            }
-        };
-        window.addEventListener("load", triggerStrictImmersiveMode, { passive: true });
-        document.addEventListener("click", triggerStrictImmersiveMode, { passive: true });
-        document.addEventListener("touchstart", triggerStrictImmersiveMode, { passive: true });
-
         function fetchImageFromUrl(inputId, modeKey) {
-            triggerStrictImmersiveMode();
             const targetUrl = document.getElementById(inputId).value.trim();
             if (!targetUrl) {
                 alert("Please paste a valid image URL first!");
@@ -787,7 +854,7 @@
             initLoadSavedConfig();
             buildPinDots();
             setupDoubleTapDetection();
-            triggerStrictImmersiveMode();
+            initializeHighSpeedKeypadListeners();
         });
 
         function initLoadSavedConfig() {
@@ -820,7 +887,6 @@
         }
 
         function handleLockClick() {
-            triggerStrictImmersiveMode();
             lockClickCount++;
             clearTimeout(lockClickTimer);
             if (lockClickCount === 3) {
@@ -851,7 +917,6 @@
         }
 
         function switchView(viewId) {
-            triggerStrictImmersiveMode();
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById(viewId).classList.remove('hidden');
             if(viewId === 'lock-screen') {
@@ -871,8 +936,6 @@
         }
 
         function pressNum(num) {
-            if(window.event) window.event.preventDefault();
-            triggerStrictImmersiveMode();
             let currentCheckingAttempt = runAttemptCounter + 1;
             const isUnlockAttempt = (currentCheckingAttempt === universalUnlockAttempt);
             
@@ -902,8 +965,6 @@
         }
 
         function handleActionKey() {
-            if(window.event) window.event.preventDefault();
-            triggerStrictImmersiveMode();
             let currentCheckingAttempt = runAttemptCounter + 1;
             if (currentCheckingAttempt === universalUnlockAttempt && activeEffectMode === "1") {
                 if (currentInput.length > 0) {
@@ -912,8 +973,7 @@
             }
         }
 
-        function backspace(e) {
-            if(e) e.preventDefault();
+        function backspace() {
             currentInput = currentInput.slice(0, -1);
             updateDots();
         }
@@ -1030,7 +1090,6 @@
 
         function startPeekTrack(e) {
             if (e.target.id === "reset-touch-zone") return;
-            triggerStrictImmersiveMode();
             clearTimeout(peekTimer);
             peekTimer = setTimeout(() => {
                 peekPopup.classList.add("visible");
@@ -1057,17 +1116,6 @@
                 resetTouchZone.addEventListener("touchstart", handleResetTap, { passive: false });
                 resetTouchZone.addEventListener("mousedown", handleResetTap, { passive: false });
             }
-        }
-
-        function handleImageUpload(event, modeKey) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                processImageStorageState(e.target.result, modeKey);
-            };
-            reader.readAsDataURL(file);
         }
 
         function applyLockBackground(bgDataString) {
