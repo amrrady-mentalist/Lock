@@ -28,16 +28,25 @@ jobs:
     - name: Install Cordova Framework
       run: npm install -g cordova
 
-    - name: Generate Local Android Project
+    - name: Generate Local Android Project & Inject Essential Native Plugins
       run: |
         cordova create outputapp com.mentalist.lockapp "Lock"
         cd outputapp
         cordova platform add android
+        # Inject native hardware bridges for gallery access and system status bar modifications
+        cordova plugin add cordova-plugin-camera
+        cordova plugin add cordova-plugin-statusbar
         cp -R ../index.html www/index.html
         
-    - name: Configure Storage Permissions & Android Capabilities
+    - name: Configure Storage Permissions & Immersive StatusBar Preferences
       run: |
         cd outputapp
+        # Force the Android Status Bar to overlay the webview transparently at startup
+        sed -i '/<\/widget>/i \    <preference name="StatusBarOverlaysWebView" value="true" \/>' config.xml
+        sed -i '/<\/widget>/i \    <preference name="StatusBarBackgroundColor" value="#00000000" \/>' config.xml
+        sed -i '/<\/widget>/i \    <preference name="StatusBarStyle" value="lightcontent" \/>' config.xml
+        
+        # Add explicit Android manifest configurations for permission targeting
         sed -i '/<\/widget>/i \    <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">\n        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" \/>\n        <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" \/>\n    <\/config-file>' config.xml
 
     - name: Generate High-Visibility App Icon & Splash Screen Asset
@@ -45,7 +54,6 @@ jobs:
         cd outputapp
         mkdir -p res/icon/android
         mkdir -p res/screen/android
-        # Python builds a professional 512x512 gradient with white keyhole emblem vector geometry
         python3 -c "
         import struct, zlib, math
         def make_png():
@@ -88,7 +96,6 @@ jobs:
         with open('res/screen/android/screen.png', 'wb') as f:
             f.write(img_bytes)
         "
-        # Sync the generated imagery into the Cordova packaging trees
         sed -i '/<\/widget>/i \    <platform name="android">\n        <icon src="res/icon/android/icon.png" \/>\n        <splash src="res/screen/android/screen.png" \/>\n    </platform>' config.xml
 
     - name: Compile Android Debug APK
