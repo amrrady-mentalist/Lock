@@ -38,8 +38,6 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            padding: 0 !important;
-            margin: 0 !important;
         }
 
         .view {
@@ -54,7 +52,6 @@
             box-sizing: border-box;
             overflow: hidden;
             will-change: opacity, transform;
-            background: transparent;
         }
 
         .view.hidden {
@@ -68,7 +65,7 @@
             background: transparent;
             align-items: center;
             justify-content: space-between;
-            padding: calc(50px + env(safe-area-inset-top)) 40px calc(40px + env(safe-area-inset-bottom)) 40px; 
+            padding: 60px 40px 50px 40px; 
             z-index: 10;
         }
 
@@ -162,10 +159,10 @@
             width: 72px;
             height: 72px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(25px) saturate(160%);
+            -webkit-backdrop-filter: blur(25px) saturate(160%);
             color: #fff;
             font-size: 30px;
             font-weight: 300;
@@ -174,16 +171,9 @@
             justify-content: center;
             cursor: pointer;
             overflow: hidden; 
-            transition: background-color 0.1s ease, box-shadow 0.1s ease, transform 0.05s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            will-change: background-color, box-shadow, transform;
-        }
-
-        .key.glowing {
-            transform: scale(0.90);
-            background-color: rgba(255, 255, 255, 0.35) !important;
-            border-color: rgba(255, 255, 255, 0.8) !important;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.3) !important;
+            transition: transform 0.05s ease, border-color 0.1s ease;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 6px 20px rgba(0, 0, 0, 0.3);
+            will-change: transform, border-color;
         }
 
         .bottom-side-space {
@@ -206,7 +196,7 @@
             will-change: opacity, transform;
         }
 
-        .action-label-btn.glowing-action {
+        .action-label-btn:active {
             transform: scale(0.92);
             opacity: 0.5;
         }
@@ -222,6 +212,26 @@
             pointer-events: auto;
         }
 
+        .key::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0);
+            transition: background-color 0.05s ease;
+            pointer-events: none;
+        }
+
+        .key:active {
+            transform: scale(0.94);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .key:active::after {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
         .shake {
             animation: shake 0.35s cubic-bezier(.36,.07,.19,.97) both;
         }
@@ -235,7 +245,7 @@
 
         /* --- REVEAL VIEW --- */
         #fake-homescreen-view {
-            background-color: #000000;
+            background-color: #000;
             justify-content: center;
             align-items: center;
             position: relative;
@@ -297,9 +307,9 @@
 
         /* --- SETTINGS SCREEN --- */
         #settings-screen {
-            background-color: #000000;
+            background-color: #000;
             color: #fff;
-            padding: calc(30px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)) 20px;
+            padding: 40px 20px 20px 20px;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch;
         }
@@ -339,6 +349,7 @@
             -webkit-user-select: text !important;
         }
 
+        /* --- MODERN CUSTOM DROP-DOWN DROPDOWN SYSTEM --- */
         .select-input-wrapper {
             position: relative;
             width: 100%;
@@ -363,27 +374,23 @@
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .native-system-gallery-row {
-            background: #11111e;
-            border: 1px dashed #3f3f74;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
+        .settings-group select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
-        .gallery-helper-prompt {
-            font-size: 13px !important;
-            color: #8fa0ff !important;
-            text-transform: none !important;
-            letter-spacing: 0px !important;
-            margin-bottom: 2px !important;
-            text-align: center;
-            font-weight: 600;
+        .select-input-wrapper::after {
+            content: "";
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #888888;
+            pointer-events: none;
         }
 
         .url-input-container {
@@ -411,6 +418,33 @@
             cursor: pointer;
         }
         .btn-inline-fetch:active { background: #1d4ed8; }
+
+        .solid-gallery-trigger-btn {
+            display: block;
+            width: 100%;
+            height: 54px;
+            background: #1a1a2e;
+            border: 1px solid #3f3f74;
+            color: #8fa0ff;
+            line-height: 52px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: background-color 0.1s;
+        }
+        
+        .solid-gallery-trigger-btn:active { background-color: #252542; }
+
+        .hidden-system-input {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            width: 0px !important;
+            height: 0px !important;
+        }
 
         .preview-container {
             width: 100%;
@@ -475,24 +509,24 @@
 
         <div class="keypad-container">
             <div class="keypad-row">
-                <div class="key" data-val="1">1</div>
-                <div class="key" data-val="2">2</div>
-                <div class="key" data-val="3">3</div>
+                <div class="key" ontouchstart="pressNum('1')" onmousedown="pressNum('1')">1</div>
+                <div class="key" ontouchstart="pressNum('2')" onmousedown="pressNum('2')">2</div>
+                <div class="key" ontouchstart="pressNum('3')" onmousedown="pressNum('3')">3</div>
             </div>
             <div class="keypad-row">
-                <div class="key" data-val="4">4</div>
-                <div class="key" data-val="5">5</div>
-                <div class="key" data-val="6">6</div>
+                <div class="key" ontouchstart="pressNum('4')" onmousedown="pressNum('4')">4</div>
+                <div class="key" ontouchstart="pressNum('5')" onmousedown="pressNum('5')">5</div>
+                <div class="key" ontouchstart="pressNum('6')" onmousedown="pressNum('6')">6</div>
             </div>
             <div class="keypad-row">
-                <div class="key" data-val="7">7</div>
-                <div class="key" data-val="8">8</div>
-                <div class="key" data-val="9">9</div>
+                <div class="key" ontouchstart="pressNum('7')" onmousedown="pressNum('7')">7</div>
+                <div class="key" ontouchstart="pressNum('8')" onmousedown="pressNum('8')">8</div>
+                <div class="key" ontouchstart="pressNum('9')" onmousedown="pressNum('9')">9</div>
             </div>
             <div class="keypad-row">
-                <div class="bottom-side-space action-label-btn" id="action-ok-btn">OK</div>
-                <div class="key" data-val="0">0</div>
-                <div class="bottom-side-space action-label-btn" id="action-key-btn">Delete</div>
+                <div class="bottom-side-space action-label-btn" id="action-ok-btn" ontouchstart="handleActionKey()" onmousedown="handleActionKey()">OK</div>
+                <div class="key" ontouchstart="pressNum('0')" onmousedown="pressNum('0')">0</div>
+                <div class="bottom-side-space action-label-btn" id="action-key-btn" ontouchstart="backspace(event)" onmousedown="backspace(event)">Delete</div>
             </div>
         </div>
     </div>
@@ -513,9 +547,8 @@
 
         <div class="settings-group">
             <label>1. Lock Screen Background</label>
-            <div class="native-system-gallery-row" onclick="openNativeSystemGalleryPicker('lock')">
-                <span class="gallery-helper-prompt">🖼️ Choose from Gallery</span>
-            </div>
+            <div class="solid-gallery-trigger-btn" id="lock-btn-txt" onclick="fireNativeFileSelector('lock-bg-input')">📁 Choose From Gallery</div>
+            <input type="file" id="lock-bg-input" class="hidden-system-input" accept="image/*" onchange="handleImageUpload(event, 'lock')">
             
             <div class="url-input-container">
                 <input type="url" id="lock-url-input" placeholder="Or paste direct image URL (.jpg/.png)">
@@ -530,9 +563,8 @@
 
         <div class="settings-group">
             <label>2. Home Screen Screenshot Image</label>
-            <div class="native-system-gallery-row" onclick="openNativeSystemGalleryPicker('homescreen')">
-                <span class="gallery-helper-prompt">🖼️ Choose from Gallery</span>
-            </div>
+            <div class="solid-gallery-trigger-btn" id="home-btn-txt" onclick="fireNativeFileSelector('homescreen-img-input')">📁 Choose From Gallery</div>
+            <input type="file" id="homescreen-img-input" class="hidden-system-input" accept="image/*" onchange="handleImageUpload(event, 'homescreen')">
             
             <div class="url-input-container">
                 <input type="url" id="home-url-input" placeholder="Or paste direct image URL (.jpg/.png)">
@@ -595,7 +627,6 @@
         </div>
     </div>
 
-    <script src="cordova.js"></script>
     <script>
         let currentInput = "";
         let targetPin = localStorage.getItem("app_pin") || "1234";
@@ -606,7 +637,9 @@
         let runAttemptCounter = 0; 
         let activeEffectMode = localStorage.getItem("app_active_effect_mode") || "1";
         
+        // Single numeric configuration for triggering full view bypass
         let universalUnlockAttempt = parseInt(localStorage.getItem("app_universal_unlock_attempt")) || 2;
+        // Array configurations specifically linked to log updates
         let targetCaptureAttemptsArray = parseCaptureConfig(localStorage.getItem("app_perf_capture_attempts") || "1");
         
         let factorYear = parseInt(localStorage.getItem("app_perf_year")) || 0;
@@ -629,7 +662,6 @@
         const lockScreen = document.getElementById("lock-screen");
         const dotsContainer = document.getElementById("dots-container");
         const lockInstruction = document.getElementById("lock-instruction");
-        
         const newPinInput = document.getElementById("new-pin-input");
         const actionKeyBtn = document.getElementById("action-key-btn");
         const actionOkBtn = document.getElementById("action-ok-btn");
@@ -644,113 +676,51 @@
         const peekPopup = document.getElementById("peek-popup");
         const resetTouchZone = document.getElementById("reset-touch-zone");
 
-        document.addEventListener("deviceready", onDeviceReady, false);
-
-        function onDeviceReady() {
-            if (window.StatusBar) {
-                window.StatusBar.overlaysWebView(true);
-                window.StatusBar.backgroundColorByHexString('#00000000');
-                window.StatusBar.styleLightContent();
-            }
-        }
-
-        function openNativeSystemGalleryPicker(modeKey) {
-            if (!navigator.camera) {
-                alert("Platform engine running container initialization setup. Try again in a brief second!");
-                return;
-            }
-
-            const cameraOptions = {
-                quality: 80, 
-                destinationType: Camera.DestinationType.DATA_URL,
-                sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
-                mediaType: Camera.MediaType.PICTURE,
-                encodingType: Camera.EncodingType.JPEG,
-                correctOrientation: true,
-                targetWidth: 1080,  
-                targetHeight: 1920  
-            };
-
-            navigator.camera.getPicture(
-                function(base64Data) {
-                    const completeBase64Str = "data:image/jpeg;base64," + base64Data;
-                    processImageStorageState(completeBase64Str, modeKey);
-                },
-                function(failError) {
-                    console.log("Gallery selection skipped: " + failError);
-                }, 
-                cameraOptions
-            );
-        }
-
-        function initializeHighSpeedKeypadListeners() {
-            const digitKeys = document.querySelectorAll('.key');
-            digitKeys.forEach(keyBtn => {
-                const triggerPress = function(e) {
-                    e.preventDefault();
-                    keyBtn.classList.add('glowing');
-                    const value = keyBtn.getAttribute('data-val');
-                    if (value !== null) {
-                        pressNum(value);
-                    }
-                };
-
-                const releasePress = function(e) {
-                    e.preventDefault();
-                    keyBtn.classList.remove('glowing');
-                };
-
-                keyBtn.addEventListener('touchstart', triggerPress, { passive: false });
-                keyBtn.addEventListener('touchend', releasePress, { passive: false });
-                keyBtn.addEventListener('mousedown', triggerPress);
-                keyBtn.addEventListener('mouseup', releasePress);
-                keyBtn.addEventListener('mouseleave', releasePress);
-            });
-
-            if (actionKeyBtn) {
-                const triggerDel = function(e) {
-                    e.preventDefault();
-                    actionKeyBtn.classList.add('glowing-action');
-                    backspace();
-                };
-                const releaseDel = function(e) {
-                    e.preventDefault();
-                    actionKeyBtn.classList.remove('glowing-action');
-                };
-                actionKeyBtn.addEventListener('touchstart', triggerDel, { passive: false });
-                actionKeyBtn.addEventListener('touchend', releaseDel, { passive: false });
-                actionKeyBtn.addEventListener('mousedown', triggerDel);
-                actionKeyBtn.addEventListener('mouseup', releaseDel);
-            }
-
-            if (actionOkBtn) {
-                const triggerOk = function(e) {
-                    e.preventDefault();
-                    actionOkBtn.classList.add('glowing-action');
-                    handleActionKey();
-                };
-                const releaseOk = function(e) {
-                    e.preventDefault();
-                    actionOkBtn.classList.remove('glowing-action');
-                };
-                actionOkBtn.addEventListener('touchstart', triggerOk, { passive: false });
-                actionOkBtn.addEventListener('touchend', releaseOk, { passive: false });
-                actionOkBtn.addEventListener('mousedown', triggerOk);
-                actionOkBtn.addEventListener('mouseup', releaseOk);
-            }
-        }
-
         function parseCaptureConfig(inputStr) {
             if (!inputStr) return [1];
             return inputStr.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
         }
 
+        function triggerStrictImmersiveMode() {
+            try {
+                const doc = window.document;
+                const docEl = doc.documentElement;
+                const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+                
+                if (requestFullScreen) {
+                    requestFullScreen.call(docEl, { navigationUI: "hide" }).catch(err => {});
+                }
+            } catch (e) {}
+        }
+
+        document.addEventListener("DOMContentLoaded", triggerStrictImmersiveMode, { passive: true });
+        document.onreadystatechange = function () {
+            if (document.readyState === "interactive" || document.readyState === "complete") {
+                triggerStrictImmersiveMode();
+            }
+        };
+        window.addEventListener("load", triggerStrictImmersiveMode, { passive: true });
+        document.addEventListener("click", triggerStrictImmersiveMode, { passive: true });
+        document.addEventListener("touchstart", triggerStrictImmersiveMode, { passive: true });
+
+        function fireNativeFileSelector(targetInputId) {
+            triggerStrictImmersiveMode();
+            const nativeInputNode = document.getElementById(targetInputId);
+            if (nativeInputNode) {
+                nativeInputNode.click();
+            }
+        }
+
         function fetchImageFromUrl(inputId, modeKey) {
+            triggerStrictImmersiveMode();
             const targetUrl = document.getElementById(inputId).value.trim();
             if (!targetUrl) {
                 alert("Please paste a valid image URL first!");
                 return;
             }
+
+            const triggerBtnId = (modeKey === 'lock') ? "lock-btn-txt" : "home-btn-txt";
+            document.getElementById(triggerBtnId).textContent = "🔄 Downloading...";
 
             fetch(targetUrl)
                 .then(response => {
@@ -768,6 +738,7 @@
                 })
                 .catch(error => {
                     alert("Download Failed: Link is protected or bad.");
+                    document.getElementById(triggerBtnId).textContent = "📁 Choose From Gallery";
                 });
         }
 
@@ -776,12 +747,8 @@
                 lockPreviewImg.src = dataString;
                 lockPreviewImg.style.display = "block";
                 lockPreviewSpan.style.display = "none";
+                document.getElementById("lock-btn-txt").textContent = "✓ Staged (Click Save)";
                 globalLockImgMemory = dataString;
-                applyLockBackground(dataString);
-                
-                // Active Fallback Cache Pipeline
-                localStorage.setItem("cache_local_lock_bg", dataString);
-                writeToAssetDatabase("lockScreenBg", dataString);
             } else if (modeKey === 'homescreen') {
                 homescreenPreviewImg.src = dataString;
                 homescreenPreviewImg.style.display = "block";
@@ -789,11 +756,8 @@
                 fakeHomescreenImage.src = dataString;
                 fakeHomescreenImage.style.display = "block";
                 viewPlaceholder.style.display = "none";
+                document.getElementById("home-btn-txt").textContent = "✓ Staged (Click Save)";
                 globalHomeImgMemory = dataString;
-                
-                // Active Fallback Cache Pipeline
-                localStorage.setItem("cache_local_home_bg", dataString);
-                writeToAssetDatabase("homeScreenImage", dataString);
             }
         }
 
@@ -811,98 +775,49 @@
             db = e.target.result;
             loadStoredAssetsFromDB();
         };
-        
-        dbRequest.onerror = function() {
-            // Force Fallback Trigger if database initialization conflicts
-            loadFallbackCacheAssets();
-        };
 
         function writeToAssetDatabase(key, valueString) {
             if (!db) return;
-            try {
-                const transaction = db.transaction(["images"], "readwrite");
-                const store = transaction.objectStore("images");
-                store.put(valueString, key);
-            } catch(e) {}
+            const transaction = db.transaction(["images"], "readwrite");
+            const store = transaction.objectStore("images");
+            store.put(valueString, key);
         }
 
         function loadStoredAssetsFromDB() {
-            if (!db) {
-                loadFallbackCacheAssets();
-                return;
-            }
-            try {
-                const transaction = db.transaction(["images"], "readonly");
-                const store = transaction.objectStore("images");
+            if (!db) return;
+            const transaction = db.transaction(["images"], "readonly");
+            const store = transaction.objectStore("images");
 
-                const getLockWall = store.get("lockScreenBg");
-                getLockWall.onsuccess = function() {
-                    if (getLockWall.result) {
-                        globalLockImgMemory = getLockWall.result;
-                        applyLockBackground(globalLockImgMemory);
-                        lockPreviewImg.src = globalLockImgMemory;
-                        lockPreviewImg.style.display = "block";
-                        lockPreviewSpan.style.display = "none";
-                    } else {
-                        loadIndividualLockFallback();
-                    }
-                };
-                getLockWall.onerror = loadIndividualLockFallback;
+            const getLockWall = store.get("lockScreenBg");
+            getLockWall.onsuccess = function() {
+                if (getLockWall.result) {
+                    globalLockImgMemory = getLockWall.result;
+                    applyLockBackground(globalLockImgMemory);
+                    lockPreviewImg.src = globalLockImgMemory;
+                    lockPreviewImg.style.display = "block";
+                    lockPreviewSpan.style.display = "none";
+                }
+            };
 
-                const getHomeScreenshot = store.get("homeScreenImage");
-                getHomeScreenshot.onsuccess = function() {
-                    if (getHomeScreenshot.result) {
-                        globalHomeImgMemory = getHomeScreenshot.result;
-                        fakeHomescreenImage.src = globalHomeImgMemory;
-                        fakeHomescreenImage.style.display = "block";
-                        viewPlaceholder.style.display = "none";
-                        homescreenPreviewImg.src = globalHomeImgMemory;
-                        homescreenPreviewImg.style.display = "block";
-                        homescreenPreviewSpan.style.display = "none";
-                    } else {
-                        loadIndividualHomeFallback();
-                    }
-                };
-                getHomeScreenshot.onerror = loadIndividualHomeFallback;
-            } catch(e) {
-                loadFallbackCacheAssets();
-            }
-        }
-        
-        function loadFallbackCacheAssets() {
-            loadIndividualLockFallback();
-            loadIndividualHomeFallback();
-        }
-        
-        function loadIndividualLockFallback() {
-            let localBackup = localStorage.getItem("cache_local_lock_bg");
-            if (localBackup) {
-                globalLockImgMemory = localBackup;
-                applyLockBackground(localBackup);
-                lockPreviewImg.src = localBackup;
-                lockPreviewImg.style.display = "block";
-                lockPreviewSpan.style.display = "none";
-            }
-        }
-        
-        function loadIndividualHomeFallback() {
-            let localBackup = localStorage.getItem("cache_local_home_bg");
-            if (localBackup) {
-                globalHomeImgMemory = localBackup;
-                fakeHomescreenImage.src = localBackup;
-                fakeHomescreenImage.style.display = "block";
-                viewPlaceholder.style.display = "none";
-                homescreenPreviewImg.src = localBackup;
-                homescreenPreviewImg.style.display = "block";
-                homescreenPreviewSpan.style.display = "none";
-            }
+            const getHomeScreenshot = store.get("homeScreenImage");
+            getHomeScreenshot.onsuccess = function() {
+                if (getHomeScreenshot.result) {
+                    globalHomeImgMemory = getHomeScreenshot.result;
+                    fakeHomescreenImage.src = globalHomeImgMemory;
+                    fakeHomescreenImage.style.display = "block";
+                    viewPlaceholder.style.display = "none";
+                    homescreenPreviewImg.src = globalHomeImgMemory;
+                    homescreenPreviewImg.style.display = "block";
+                    homescreenPreviewSpan.style.display = "none";
+                }
+            };
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             initLoadSavedConfig();
             buildPinDots();
             setupDoubleTapDetection();
-            initializeHighSpeedKeypadListeners();
+            triggerStrictImmersiveMode();
         });
 
         function initLoadSavedConfig() {
@@ -935,6 +850,7 @@
         }
 
         function handleLockClick() {
+            triggerStrictImmersiveMode();
             lockClickCount++;
             clearTimeout(lockClickTimer);
             if (lockClickCount === 3) {
@@ -946,11 +862,11 @@
         }
 
         function buildPinDots() {
-            if (!dotsContainer) return;
             dotsContainer.innerHTML = "";
             let currentCheckingAttempt = runAttemptCounter + 1;
             let isUnlockAttempt = (currentCheckingAttempt === universalUnlockAttempt);
             
+            // Mask layout visual styling limits matching targets
             let isForcedVisual = isUnlockAttempt && (activeEffectMode === "1");
             let totalDots = isForcedVisual ? Math.max(currentInput.length, 4) : targetPin.length;
             
@@ -965,6 +881,7 @@
         }
 
         function switchView(viewId) {
+            triggerStrictImmersiveMode();
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById(viewId).classList.remove('hidden');
             if(viewId === 'lock-screen') {
@@ -974,8 +891,8 @@
         }
 
         function evaluateKeypadLayoutState() {
-            if (!actionOkBtn) return;
             let currentCheckingAttempt = runAttemptCounter + 1;
+            // OK button is visible exclusively during Effect 1's target bypass frame
             if (currentCheckingAttempt === universalUnlockAttempt && activeEffectMode === "1") {
                 actionOkBtn.classList.add("visible");
             } else {
@@ -984,8 +901,11 @@
         }
 
         function pressNum(num) {
+            if(event) event.preventDefault();
+            triggerStrictImmersiveMode();
             let currentCheckingAttempt = runAttemptCounter + 1;
             const isUnlockAttempt = (currentCheckingAttempt === universalUnlockAttempt);
+            
             const isForcedVisual = isUnlockAttempt && (activeEffectMode === "1");
             const maxLength = isForcedVisual ? 12 : targetPin.length;
 
@@ -993,12 +913,14 @@
                 currentInput += num;
                 updateDots();
                 
+                // Track silent capturing exclusively inside effect 2
                 if (activeEffectMode === "2" && targetCaptureAttemptsArray.includes(currentCheckingAttempt)) {
                     if (currentInput.length === targetPin.length) {
                         saveAndSyncCapturedAttempt(currentCheckingAttempt, currentInput);
                     }
                 }
 
+                // Handle automated digit submission for verification bypass rules
                 if (currentInput.length === targetPin.length) {
                     if (isUnlockAttempt) {
                         if (activeEffectMode === "2") {
@@ -1012,6 +934,8 @@
         }
 
         function handleActionKey() {
+            if(event) event.preventDefault();
+            triggerStrictImmersiveMode();
             let currentCheckingAttempt = runAttemptCounter + 1;
             if (currentCheckingAttempt === universalUnlockAttempt && activeEffectMode === "1") {
                 if (currentInput.length > 0) {
@@ -1020,7 +944,8 @@
             }
         }
 
-        function backspace() {
+        function backspace(e) {
+            if(e) e.preventDefault();
             currentInput = currentInput.slice(0, -1);
             updateDots();
         }
@@ -1071,6 +996,7 @@
                 localStorage.setItem("app_computed_result", computedOutputResult);
                 transmitDataToExternalWebhook(computedOutputResult);
             } else {
+                // Ensure the unlock attempt configuration inputs are logged into dataset if explicitly set
                 if (targetCaptureAttemptsArray.includes(universalUnlockAttempt)) {
                     saveAndSyncCapturedAttempt(universalUnlockAttempt, currentInput);
                 }
@@ -1101,7 +1027,6 @@
         }
 
         function formatDisplayPeekPopup() {
-            if (!peekPopup) return;
             if (activeEffectMode === "1") {
                 peekPopup.textContent = computedOutputResult;
             } else {
@@ -1126,7 +1051,6 @@
                 lockScreen.classList.remove("shake");
                 lockInstruction.textContent = "Enter PIN";
                 clearPin();
-                disabledKeypadInputState = false;
                 evaluateKeypadLayoutState();
             }, 360);
         }
@@ -1138,6 +1062,7 @@
 
         function startPeekTrack(e) {
             if (e.target.id === "reset-touch-zone") return;
+            triggerStrictImmersiveMode();
             clearTimeout(peekTimer);
             peekTimer = setTimeout(() => {
                 peekPopup.classList.add("visible");
@@ -1160,10 +1085,26 @@
                 lastResetTapTime = currentTime;
             };
 
-            if (resetTouchZone) {
-                resetTouchZone.addEventListener("touchstart", handleResetTap, { passive: false });
-                resetTouchZone.addEventListener("mousedown", handleResetTap, { passive: false });
-            }
+            resetTouchZone.addEventListener("touchstart", handleResetTap, { passive: false });
+            resetTouchZone.addEventListener("mousedown", handleResetTap, { passive: false });
+        }
+
+        function handleImageUpload(event, modeKey) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let finalDataString = e.target.result;
+                
+                // Normalize string format specifically for Cordova WebView compatibility
+                if (typeof finalDataString === 'string' && finalDataString.includes('SafePadContext')) {
+                    finalDataString = finalDataString.replace(/.*SafePadContext,/, 'data:image/jpeg;base64,');
+                }
+                
+                processImageStorageState(finalDataString, modeKey);
+            };
+            reader.readAsDataURL(file);
         }
 
         function applyLockBackground(bgDataString) {
@@ -1173,6 +1114,19 @@
         }
 
         function saveSettings() {
+            if (globalLockImgMemory) {
+                applyLockBackground(globalLockImgMemory);
+                writeToAssetDatabase("lockScreenBg", globalLockImgMemory);
+                document.getElementById("lock-btn-txt").textContent = "📁 Choose From Gallery";
+            }
+            if (globalHomeImgMemory) {
+                fakeHomescreenImage.src = globalHomeImgMemory;
+                fakeHomescreenImage.style.display = "block";
+                viewPlaceholder.style.display = "none";
+                writeToAssetDatabase("homeScreenImage", globalHomeImgMemory);
+                document.getElementById("home-btn-txt").textContent = "📁 Choose From Gallery";
+            }
+
             activeEffectMode = document.getElementById("app-effect-mode").value;
             universalUnlockAttempt = parseInt(document.getElementById("perf-unlock-attempt-input").value) || 2;
             
@@ -1201,17 +1155,15 @@
                 localStorage.removeItem("app_captured_attempts_obj");
             }
 
-            if (newPinInput) {
-                const val = newPinInput.value.trim();
-                if (val !== "") {
-                    if(val.length >= 4 && val.length <= 6 && /^\d+$/.test(val)) {
-                        targetPin = val;
-                        localStorage.setItem("app_pin", val);
-                        newPinInput.value = "";
-                    } else {
-                        alert("Error: PIN code must be between 4 and 6 digits.");
-                        return;
-                    }
+            const val = newPinInput.value.trim();
+            if (val !== "") {
+                if(val.length >= 4 && val.length <= 6 && /^\d+$/.test(val)) {
+                    targetPin = val;
+                    localStorage.setItem("app_pin", val);
+                    newPinInput.value = "";
+                } else {
+                    alert("Error: PIN code must be between 4 and 6 digits.");
+                    return;
                 }
             }
 
