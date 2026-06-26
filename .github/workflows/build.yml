@@ -33,7 +33,6 @@ jobs:
         cordova create outputapp com.mentalist.lockapp "Lock"
         cd outputapp
         cordova platform add android
-        # Inject native hardware bridges for gallery access and system status bar modifications
         cordova plugin add cordova-plugin-camera
         cordova plugin add cordova-plugin-statusbar
         cp -R ../index.html www/index.html
@@ -41,10 +40,8 @@ jobs:
     - name: Configure Storage Permissions & Immersive StatusBar Preferences
       run: |
         cd outputapp
-        # Force the Android Status Bar to overlay the webview transparently at startup
-        sed -i '/<\/widget>/i \    <preference name="StatusBarOverlaysWebView" value="true" \/>' config.xml
-        sed -i '/<\/widget>/i \    <preference name="StatusBarBackgroundColor" value="#00000000" \/>' config.xml
-        sed -i '/<\/widget>/i \    <preference name="StatusBarStyle" value="lightcontent" \/>' config.xml
+        # Inject explicit Android preferences inside the platform tags safely
+        sed -i '/<platform name="android">/a \        <preference name="StatusBarOverlaysWebView" value="true" />\n        <preference name="StatusBarBackgroundColor" value="#00000000" />\n        <preference name="StatusBarStyle" value="lightcontent" />\n        <preference name="Fullscreen" value="true" />' config.xml
         
         # Add explicit Android manifest configurations for permission targeting
         sed -i '/<\/widget>/i \    <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">\n        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" \/>\n        <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" \/>\n    <\/config-file>' config.xml
@@ -64,11 +61,9 @@ jobs:
                 for x in range(w):
                     dx, dy = x - 256, y - 256
                     dist = math.sqrt(dx*dx + dy*dy)
-                    
                     r = max(10, int(25 - (dist * 0.02)))
                     g = max(12, int(15 - (dist * 0.01)))
                     b = max(35, int(55 - (dist * 0.05)))
-                    
                     in_keyhole = False
                     if math.sqrt(dx*dx + (dy + 30)*(dy + 30)) < 45:
                         in_keyhole = True
@@ -76,12 +71,9 @@ jobs:
                         w_at_y = 20 + (dy - (-10)) * 0.45
                         if abs(dx) < w_at_y:
                             in_keyhole = True
-                            
                     if in_keyhole:
                         r, g, b = 245, 245, 250
-                        
                     img_data.extend([r, g, b])
-            
             chunks = [
                 b'\x89PNG\r\n\x1a\n',
                 b'IHDR' + struct.pack('>IIBBBBB', w, h, 8, 2, 0, 0, 0),
@@ -89,14 +81,13 @@ jobs:
                 b'IEND'
             ]
             return b''.join([c if i==0 else struct.pack('>I', len(c)-4) + c + struct.pack('>I', zlib.crc32(c)) for i, c in enumerate(chunks)])
-            
         img_bytes = make_png()
         with open('res/icon/android/icon.png', 'wb') as f:
             f.write(img_bytes)
         with open('res/screen/android/screen.png', 'wb') as f:
             f.write(img_bytes)
         "
-        sed -i '/<\/widget>/i \    <platform name="android">\n        <icon src="res/icon/android/icon.png" \/>\n        <splash src="res/screen/android/screen.png" \/>\n    </platform>' config.xml
+        sed -i '/<platform name="android">/a \        <icon src="res/icon/android/icon.png" />\n        <splash src="res/screen/android/screen.png" />' config.xml
 
     - name: Compile Android Debug APK
       run: |
