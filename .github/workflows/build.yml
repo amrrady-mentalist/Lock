@@ -36,15 +36,16 @@ jobs:
         cp -R ../index.html www/index.html
         
     - name: Configure Storage Permissions & Android Capabilities
-      # FIXED: Added the required xmlns:android namespace attribute directly to the config-file target block
       run: |
         cd outputapp
         sed -i '/<\/widget>/i \    <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">\n        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" \/>\n        <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" \/>\n    <\/config-file>' config.xml
 
-    - name: Generate High-Visibility App Icon (Custom Magic Design)
+    - name: Generate High-Visibility App Icon & Splash Screen Asset
       run: |
         cd outputapp
         mkdir -p res/icon/android
+        mkdir -p res/screen/android
+        # Python builds a professional 512x512 gradient with white keyhole emblem vector geometry
         python3 -c "
         import struct, zlib, math
         def make_png():
@@ -81,10 +82,14 @@ jobs:
             ]
             return b''.join([c if i==0 else struct.pack('>I', len(c)-4) + c + struct.pack('>I', zlib.crc32(c)) for i, c in enumerate(chunks)])
             
+        img_bytes = make_png()
         with open('res/icon/android/icon.png', 'wb') as f:
-            f.write(make_png())
+            f.write(img_bytes)
+        with open('res/screen/android/screen.png', 'wb') as f:
+            f.write(img_bytes)
         "
-        sed -i '/<\/widget>/i \    <platform name="android">\n        <icon src="res/icon/android/icon.png" \/>\n    <\/platform>' config.xml
+        # Sync the generated imagery into the Cordova packaging trees
+        sed -i '/<\/widget>/i \    <platform name="android">\n        <icon src="res/icon/android/icon.png" \/>\n        <splash src="res/screen/android/screen.png" \/>\n    </platform>' config.xml
 
     - name: Compile Android Debug APK
       run: |
