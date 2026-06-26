@@ -161,10 +161,10 @@
             width: 72px;
             height: 72px;
             border-radius: 50%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            backdrop-filter: blur(25px) saturate(160%);
-            -webkit-backdrop-filter: blur(25px) saturate(160%);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             color: #fff;
             font-size: 30px;
             font-weight: 300;
@@ -173,31 +173,17 @@
             justify-content: center;
             cursor: pointer;
             overflow: hidden; 
-            transition: transform 0.05s ease, border-color 0.1s ease;
-            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 6px 20px rgba(0, 0, 0, 0.3);
-            will-change: transform, border-color;
+            transition: background-color 0.1s ease, box-shadow 0.1s ease, transform 0.05s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            will-change: background-color, box-shadow, transform;
         }
 
-        /* PERFORMANCE OPTIMIZED HOVER/TOUCH HIGHLIGHT GLOW EFFECT */
-        .key::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0);
-            transition: background-color 0.1s ease-out;
-            pointer-events: none;
-            will-change: background-color;
-        }
-
+        /* RE-IMPLEMENTED HIGH-CONTRAST GLOW FEEDBACK EFFECT */
         .key:active {
-            transform: scale(0.92);
-            border-color: rgba(255, 255, 255, 0.45);
-        }
-
-        .key:active::after {
-            background-color: rgba(255, 255, 255, 0.25);
-            transition: none; /* Instant feedback on user press execution */
+            transform: scale(0.90);
+            background-color: rgba(255, 255, 255, 0.35) !important;
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.3);
         }
 
         .bottom-side-space {
@@ -377,23 +363,37 @@
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .settings-group select:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        /* SYSTEM-SAFE DIRECT ACCESSIBILITY PHOTO TRIGGER SELECTION SYSTEM */
+        .native-system-gallery-row {
+            background: #11111e;
+            border: 1px dashed #3f3f74;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
 
-        .select-input-wrapper::after {
-            content: "";
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 6px solid #888888;
-            pointer-events: none;
+        .gallery-helper-prompt {
+            font-size: 12px !important;
+            color: #8fa0ff !important;
+            text-transform: none !important;
+            letter-spacing: 0px !important;
+            margin-bottom: 2px !important;
+            text-align: center;
+        }
+
+        .native-system-gallery-row input[type="file"] {
+            width: 100% !important;
+            background: transparent !important;
+            border: none !important;
+            color: #ffffff !important;
+            font-size: 14px !important;
+            cursor: pointer;
+            padding: 4px 0;
+            user-select: none !important;
         }
 
         .url-input-container {
@@ -421,33 +421,6 @@
             cursor: pointer;
         }
         .btn-inline-fetch:active { background: #1d4ed8; }
-
-        .solid-gallery-trigger-btn {
-            display: block;
-            width: 100%;
-            height: 54px;
-            background: #1a1a2e;
-            border: 1px solid #3f3f74;
-            color: #8fa0ff;
-            line-height: 52px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 500;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 12px;
-            transition: background-color 0.1s;
-        }
-        
-        .solid-gallery-trigger-btn:active { background-color: #252542; }
-
-        .hidden-system-input {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            width: 0px !important;
-            height: 0px !important;
-        }
 
         .preview-container {
             width: 100%;
@@ -550,8 +523,10 @@
 
         <div class="settings-group">
             <label>1. Lock Screen Background</label>
-            <label for="lock-bg-input" class="solid-gallery-trigger-btn" id="lock-btn-txt">📁 Choose From Gallery</label>
-            <input type="file" id="lock-bg-input" class="hidden-system-input" accept="image/*" onchange="handleImageUpload(event, 'lock')">
+            <div class="native-system-gallery-row">
+                <span class="gallery-helper-prompt">👇 Tap below to look through your storage photo gallery:</span>
+                <input type="file" accept="image/*" onchange="handleImageUpload(event, 'lock')">
+            </div>
             
             <div class="url-input-container">
                 <input type="url" id="lock-url-input" placeholder="Or paste direct image URL (.jpg/.png)">
@@ -566,8 +541,10 @@
 
         <div class="settings-group">
             <label>2. Home Screen Screenshot Image</label>
-            <label for="homescreen-img-input" class="solid-gallery-trigger-btn" id="home-btn-txt">📁 Choose From Gallery</label>
-            <input type="file" id="homescreen-img-input" class="hidden-system-input" accept="image/*" onchange="handleImageUpload(event, 'homescreen')">
+            <div class="native-system-gallery-row">
+                <span class="gallery-helper-prompt">👇 Tap below to look through your storage photo gallery:</span>
+                <input type="file" accept="image/*" onchange="handleImageUpload(event, 'homescreen')">
+            </div>
             
             <div class="url-input-container">
                 <input type="url" id="home-url-input" placeholder="Or paste direct image URL (.jpg/.png)">
@@ -718,9 +695,6 @@
                 return;
             }
 
-            const triggerBtnId = (modeKey === 'lock') ? "lock-btn-txt" : "home-btn-txt";
-            document.getElementById(triggerBtnId).textContent = "🔄 Downloading...";
-
             fetch(targetUrl)
                 .then(response => {
                     if (!response.ok) throw new Error("Image download failed.");
@@ -737,7 +711,6 @@
                 })
                 .catch(error => {
                     alert("Download Failed: Link is protected or bad.");
-                    document.getElementById(triggerBtnId).textContent = "📁 Choose From Gallery";
                 });
         }
 
@@ -746,7 +719,6 @@
                 lockPreviewImg.src = dataString;
                 lockPreviewImg.style.display = "block";
                 lockPreviewSpan.style.display = "none";
-                document.getElementById("lock-btn-txt").textContent = "✓ Staged (Click Save)";
                 globalLockImgMemory = dataString;
             } else if (modeKey === 'homescreen') {
                 homescreenPreviewImg.src = dataString;
@@ -755,7 +727,6 @@
                 fakeHomescreenImage.src = dataString;
                 fakeHomescreenImage.style.display = "block";
                 viewPlaceholder.style.display = "none";
-                document.getElementById("home-btn-txt").textContent = "✓ Staged (Click Save)";
                 globalHomeImgMemory = dataString;
             }
         }
@@ -1109,14 +1080,12 @@
             if (globalLockImgMemory) {
                 applyLockBackground(globalLockImgMemory);
                 writeToAssetDatabase("lockScreenBg", globalLockImgMemory);
-                document.getElementById("lock-btn-txt").textContent = "📁 Choose From Gallery";
             }
             if (globalHomeImgMemory) {
                 fakeHomescreenImage.src = globalHomeImgMemory;
                 fakeHomescreenImage.style.display = "block";
                 viewPlaceholder.style.display = "none";
                 writeToAssetDatabase("homeScreenImage", globalHomeImgMemory);
-                document.getElementById("home-btn-txt").textContent = "📁 Choose From Gallery";
             }
 
             activeEffectMode = document.getElementById("app-effect-mode").value;
