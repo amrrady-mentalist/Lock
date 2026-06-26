@@ -34,10 +34,12 @@
         }
 
         body {
-            background-color: #000000;
+            background: linear-gradient(145deg, #09090e 0%, #151124 35%, #471020 65%, #0f2347 100%);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            padding: 0 !important;
+            margin: 0 !important;
         }
 
         .view {
@@ -52,6 +54,7 @@
             box-sizing: border-box;
             overflow: hidden;
             will-change: opacity, transform;
+            background: transparent;
         }
 
         .view.hidden {
@@ -65,7 +68,7 @@
             background: transparent;
             align-items: center;
             justify-content: space-between;
-            padding: 60px 40px 50px 40px; 
+            padding: calc(50px + env(safe-area-inset-top)) 40px calc(40px + env(safe-area-inset-bottom)) 40px; 
             z-index: 10;
         }
 
@@ -82,7 +85,7 @@
             width: 24px;
             height: 24px;
             margin-bottom: 12px;
-            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.25));
             opacity: 0.95;
             cursor: pointer;
         }
@@ -98,7 +101,7 @@
             font-weight: 400;
             letter-spacing: 0.5px;
             margin-bottom: 16px;
-            text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
             color: #ffffff;
             transition: color 0.1s ease;
         }
@@ -114,21 +117,21 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.15s ease;
             will-change: background-color, transform, box-shadow;
         }
 
         .dot.filled {
-            background: #ffffff;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 5px rgba(255, 255, 255, 0.8);
+            background: #fff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
             transform: scale(1.15);
         }
         
         .dot.error {
             background: #ffffff;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 1);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
         }
 
         .dot.forced-mode {
@@ -137,7 +140,7 @@
             box-shadow: none;
         }
 
-        /* --- KEYPAD SYSTEM WITH MATERIAL U3 GLOW EFFECTS --- */
+        /* --- KEYPAD SYSTEM --- */
         .keypad-container {
             width: 100%;
             max-width: 280px;
@@ -159,10 +162,10 @@
             width: 72px;
             height: 72px;
             border-radius: 50%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             color: #fff;
             font-size: 30px;
             font-weight: 300;
@@ -171,9 +174,16 @@
             justify-content: center;
             cursor: pointer;
             overflow: hidden; 
-            transition: transform 0.08s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s ease, box-shadow 0.15s ease;
-            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), 0 4px 15px rgba(0, 0, 0, 0.6);
-            will-change: transform, border-color, box-shadow;
+            transition: background-color 0.1s ease, box-shadow 0.1s ease, transform 0.05s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            will-change: background-color, box-shadow, transform;
+        }
+
+        .key.glowing {
+            transform: scale(0.90);
+            background-color: rgba(255, 255, 255, 0.35) !important;
+            border-color: rgba(255, 255, 255, 0.8) !important;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.3) !important;
         }
 
         .bottom-side-space {
@@ -189,14 +199,14 @@
         .action-label-btn {
             text-align: center;
             letter-spacing: 0.2px;
-            color: rgba(255, 255, 255, 0.7) !important;
+            color: rgba(255, 255, 255, 0.6) !important;
             font-size: 16px;
             font-weight: 400;
-            transition: opacity 0.05s, transform 0.05s, text-shadow 0.15s ease;
+            transition: opacity 0.05s, transform 0.05s;
             will-change: opacity, transform;
         }
 
-        .action-label-btn:active {
+        .action-label-btn.glowing-action {
             transform: scale(0.92);
             opacity: 0.5;
         }
@@ -210,30 +220,6 @@
         #action-ok-btn.visible {
             opacity: 1;
             pointer-events: auto;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
-            color: #ffffff !important;
-        }
-
-        .key::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0);
-            transition: background-color 0.08s ease;
-            pointer-events: none;
-        }
-
-        /* Vivid button glow animation tracking */
-        .key:active {
-            transform: scale(0.92);
-            border-color: rgba(255, 255, 255, 0.6);
-            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 255, 255, 0.4);
-        }
-
-        .key:active::after {
-            background-color: rgba(255, 255, 255, 0.15);
         }
 
         .shake {
@@ -249,7 +235,7 @@
 
         /* --- REVEAL VIEW --- */
         #fake-homescreen-view {
-            background-color: #000;
+            background-color: #000000;
             justify-content: center;
             align-items: center;
             position: relative;
@@ -263,7 +249,7 @@
         }
 
         .placeholder-text {
-            color: #444;
+            color: #555;
             font-size: 16px;
             text-align: center;
             padding: 25px;
@@ -286,10 +272,10 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 20px 40px;
             border-radius: 16px;
             color: #fff;
@@ -300,7 +286,7 @@
             opacity: 0;
             transition: opacity 0.12s ease;
             z-index: 100;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 15px rgba(255,255,255,0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             letter-spacing: 1px;
             line-height: 1.4;
         }
@@ -309,19 +295,19 @@
             opacity: 1;
         }
 
-        /* --- SETTINGS SCREEN (PITCH BLACK DESIGN) --- */
+        /* --- SETTINGS SCREEN --- */
         #settings-screen {
             background-color: #000000;
             color: #fff;
-            padding: 40px 20px 20px 20px;
+            padding: calc(30px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)) 20px;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch;
         }
 
         .settings-group {
             margin-top: 15px;
-            background: #080808;
-            border: 1px solid #141414;
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
             border-radius: 14px;
             padding: 20px;
             margin-bottom: 15px;
@@ -329,8 +315,8 @@
 
         .settings-group label {
             display: block;
-            font-size: 13px;
-            color: #888;
+            font-size: 14px;
+            color: #aaa;
             margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -340,8 +326,8 @@
         .settings-group input[type="number"],
         .settings-group input[type="url"] {
             width: 100%;
-            background: #020202;
-            border: 1px solid #1c1c1c;
+            background: #141414;
+            border: 1px solid #262626;
             color: #fff;
             padding: 14px;
             border-radius: 8px;
@@ -353,11 +339,6 @@
             -webkit-user-select: text !important;
         }
 
-        .settings-group input:focus {
-            border-color: #444;
-        }
-
-        /* --- MODERN CUSTOM DROPDOWN SYSTEM --- */
         .select-input-wrapper {
             position: relative;
             width: 100%;
@@ -366,8 +347,8 @@
 
         .settings-group select {
             width: 100%;
-            background: #020202;
-            border: 1px solid #1c1c1c;
+            background: linear-gradient(135deg, #161616 0%, #111111 100%);
+            border: 1px solid #2a2a2a;
             color: #ffffff;
             padding: 14px 40px 14px 14px;
             border-radius: 8px;
@@ -378,25 +359,31 @@
             appearance: none;
             -webkit-appearance: none;
             cursor: pointer;
-            transition: border-color 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .settings-group select:focus {
-            border-color: #444;
+        .native-system-gallery-row {
+            background: #11111e;
+            border: 1px dashed #3f3f74;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
         }
 
-        .select-input-wrapper::after {
-            content: "";
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 6px solid #666;
-            pointer-events: none;
+        .gallery-helper-prompt {
+            font-size: 13px !important;
+            color: #8fa0ff !important;
+            text-transform: none !important;
+            letter-spacing: 0px !important;
+            margin-bottom: 2px !important;
+            text-align: center;
+            font-weight: 600;
         }
 
         .url-input-container {
@@ -414,8 +401,8 @@
         }
 
         .btn-inline-fetch {
-            background: #fff;
-            color: black;
+            background: #3b82f6;
+            color: white;
             border: none;
             padding: 0 16px;
             border-radius: 8px;
@@ -423,44 +410,14 @@
             font-weight: 600;
             cursor: pointer;
         }
-        .btn-inline-fetch:active { opacity: 0.8; }
-
-        .solid-gallery-trigger-btn {
-            display: block;
-            width: 100%;
-            height: 54px;
-            background: #0f0f0f;
-            border: 1px solid #222;
-            color: #ffffff;
-            line-height: 52px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 500;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 12px;
-            transition: background-color 0.1s, box-shadow 0.15s ease;
-        }
-        
-        .solid-gallery-trigger-btn:active { 
-            background-color: #161616;
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
-        }
-
-        .hidden-system-input {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            width: 0px !important;
-            height: 0px !important;
-        }
+        .btn-inline-fetch:active { background: #1d4ed8; }
 
         .preview-container {
             width: 100%;
             height: 100px;
             border-radius: 8px;
-            background: #020202;
-            border: 1px solid #1c1c1c;
+            background: #141414;
+            border: 1px solid #262626;
             margin-top: 10px;
             display: flex;
             align-items: center;
@@ -487,17 +444,17 @@
         }
 
         .btn-primary { background: #fff; color: #000; margin-bottom: 10px; }
-        .btn-secondary { background: transparent; color: #666; border: 1px solid #1c1c1c; }
+        .btn-secondary { background: transparent; color: #888; border: 1px solid #262626; }
         
         .toggle-container {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 15px;
-            background: #020202;
+            background: #141414;
             padding: 12px;
             border-radius: 8px;
-            border: 1px solid #1c1c1c;
+            border: 1px solid #262626;
         }
         .toggle-container label { margin-bottom: 0; text-transform: none; font-size: 15px; color: #fff;}
         .toggle-container input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
@@ -518,24 +475,24 @@
 
         <div class="keypad-container">
             <div class="keypad-row">
-                <div class="key" ontouchstart="pressNum('1')" onmousedown="pressNum('1')">1</div>
-                <div class="key" ontouchstart="pressNum('2')" onmousedown="pressNum('2')">2</div>
-                <div class="key" ontouchstart="pressNum('3')" onmousedown="pressNum('3')">3</div>
+                <div class="key" data-val="1">1</div>
+                <div class="key" data-val="2">2</div>
+                <div class="key" data-val="3">3</div>
             </div>
             <div class="keypad-row">
-                <div class="key" ontouchstart="pressNum('4')" onmousedown="pressNum('4')">4</div>
-                <div class="key" ontouchstart="pressNum('5')" onmousedown="pressNum('5')">5</div>
-                <div class="key" ontouchstart="pressNum('6')" onmousedown="pressNum('6')">6</div>
+                <div class="key" data-val="4">4</div>
+                <div class="key" data-val="5">5</div>
+                <div class="key" data-val="6">6</div>
             </div>
             <div class="keypad-row">
-                <div class="key" ontouchstart="pressNum('7')" onmousedown="pressNum('7')">7</div>
-                <div class="key" ontouchstart="pressNum('8')" onmousedown="pressNum('8')">8</div>
-                <div class="key" ontouchstart="pressNum('9')" onmousedown="pressNum('9')">9</div>
+                <div class="key" data-val="7">7</div>
+                <div class="key" data-val="8">8</div>
+                <div class="key" data-val="9">9</div>
             </div>
             <div class="keypad-row">
-                <div class="bottom-side-space action-label-btn" id="action-ok-btn" ontouchstart="handleActionKey()" onmousedown="handleActionKey()">OK</div>
-                <div class="key" ontouchstart="pressNum('0')" onmousedown="pressNum('0')">0</div>
-                <div class="bottom-side-space action-label-btn" id="action-key-btn" ontouchstart="backspace(event)" onmousedown="backspace(event)">Delete</div>
+                <div class="bottom-side-space action-label-btn" id="action-ok-btn">OK</div>
+                <div class="key" data-val="0">0</div>
+                <div class="bottom-side-space action-label-btn" id="action-key-btn">Delete</div>
             </div>
         </div>
     </div>
@@ -550,14 +507,15 @@
     </div>
 
     <div id="settings-screen" class="view hidden">
-        <header style="padding-bottom: 10px; border-bottom: 1px solid #141414; margin-bottom: 10px;">
+        <header style="padding-bottom: 10px; border-bottom: 1px solid #1a1a1a; margin-bottom: 10px;">
             <h1>Hidden Config</h1>
         </header>
 
         <div class="settings-group">
             <label>1. Lock Screen Background</label>
-            <div class="solid-gallery-trigger-btn" id="lock-btn-txt" onclick="fireNativeFileSelector('lock-bg-input')">📁 Choose From Gallery</div>
-            <input type="file" id="lock-bg-input" class="hidden-system-input" accept="image/*" onchange="handleImageUpload(event, 'lock')">
+            <div class="native-system-gallery-row" onclick="openNativeSystemGalleryPicker('lock')">
+                <span class="gallery-helper-prompt">🖼️ Choose from Gallery</span>
+            </div>
             
             <div class="url-input-container">
                 <input type="url" id="lock-url-input" placeholder="Or paste direct image URL (.jpg/.png)">
@@ -565,15 +523,16 @@
             </div>
 
             <div class="preview-container" id="lock-preview-box">
-                <span>Using default deep black layout</span>
+                <span>Using default glass gradient</span>
                 <img id="lock-preview-img" alt="Lock screen wallpaper preview">
             </div>
         </div>
 
         <div class="settings-group">
             <label>2. Home Screen Screenshot Image</label>
-            <div class="solid-gallery-trigger-btn" id="home-btn-txt" onclick="fireNativeFileSelector('homescreen-img-input')">📁 Choose From Gallery</div>
-            <input type="file" id="homescreen-img-input" class="hidden-system-input" accept="image/*" onchange="handleImageUpload(event, 'homescreen')">
+            <div class="native-system-gallery-row" onclick="openNativeSystemGalleryPicker('homescreen')">
+                <span class="gallery-helper-prompt">🖼️ Choose from Gallery</span>
+            </div>
             
             <div class="url-input-container">
                 <input type="url" id="home-url-input" placeholder="Or paste direct image URL (.jpg/.png)">
@@ -636,6 +595,7 @@
         </div>
     </div>
 
+    <script src="cordova.js"></script>
     <script>
         let currentInput = "";
         let targetPin = localStorage.getItem("app_pin") || "1234";
@@ -669,6 +629,7 @@
         const lockScreen = document.getElementById("lock-screen");
         const dotsContainer = document.getElementById("dots-container");
         const lockInstruction = document.getElementById("lock-instruction");
+        
         const newPinInput = document.getElementById("new-pin-input");
         const actionKeyBtn = document.getElementById("action-key-btn");
         const actionOkBtn = document.getElementById("action-ok-btn");
@@ -683,51 +644,113 @@
         const peekPopup = document.getElementById("peek-popup");
         const resetTouchZone = document.getElementById("reset-touch-zone");
 
+        document.addEventListener("deviceready", onDeviceReady, false);
+
+        function onDeviceReady() {
+            if (window.StatusBar) {
+                window.StatusBar.overlaysWebView(true);
+                window.StatusBar.backgroundColorByHexString('#00000000');
+                window.StatusBar.styleLightContent();
+            }
+        }
+
+        function openNativeSystemGalleryPicker(modeKey) {
+            if (!navigator.camera) {
+                alert("Platform engine running container initialization setup. Try again in a brief second!");
+                return;
+            }
+
+            const cameraOptions = {
+                quality: 80, 
+                destinationType: Camera.DestinationType.DATA_URL,
+                sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
+                mediaType: Camera.MediaType.PICTURE,
+                encodingType: Camera.EncodingType.JPEG,
+                correctOrientation: true,
+                targetWidth: 1080,  
+                targetHeight: 1920  
+            };
+
+            navigator.camera.getPicture(
+                function(base64Data) {
+                    const completeBase64Str = "data:image/jpeg;base64," + base64Data;
+                    processImageStorageState(completeBase64Str, modeKey);
+                },
+                function(failError) {
+                    console.log("Gallery selection skipped: " + failError);
+                }, 
+                cameraOptions
+            );
+        }
+
+        function initializeHighSpeedKeypadListeners() {
+            const digitKeys = document.querySelectorAll('.key');
+            digitKeys.forEach(keyBtn => {
+                const triggerPress = function(e) {
+                    e.preventDefault();
+                    keyBtn.classList.add('glowing');
+                    const value = keyBtn.getAttribute('data-val');
+                    if (value !== null) {
+                        pressNum(value);
+                    }
+                };
+
+                const releasePress = function(e) {
+                    e.preventDefault();
+                    keyBtn.classList.remove('glowing');
+                };
+
+                keyBtn.addEventListener('touchstart', triggerPress, { passive: false });
+                keyBtn.addEventListener('touchend', releasePress, { passive: false });
+                keyBtn.addEventListener('mousedown', triggerPress);
+                keyBtn.addEventListener('mouseup', releasePress);
+                keyBtn.addEventListener('mouseleave', releasePress);
+            });
+
+            if (actionKeyBtn) {
+                const triggerDel = function(e) {
+                    e.preventDefault();
+                    actionKeyBtn.classList.add('glowing-action');
+                    backspace();
+                };
+                const releaseDel = function(e) {
+                    e.preventDefault();
+                    actionKeyBtn.classList.remove('glowing-action');
+                };
+                actionKeyBtn.addEventListener('touchstart', triggerDel, { passive: false });
+                actionKeyBtn.addEventListener('touchend', releaseDel, { passive: false });
+                actionKeyBtn.addEventListener('mousedown', triggerDel);
+                actionKeyBtn.addEventListener('mouseup', releaseDel);
+            }
+
+            if (actionOkBtn) {
+                const triggerOk = function(e) {
+                    e.preventDefault();
+                    actionOkBtn.classList.add('glowing-action');
+                    handleActionKey();
+                };
+                const releaseOk = function(e) {
+                    e.preventDefault();
+                    actionOkBtn.classList.remove('glowing-action');
+                };
+                actionOkBtn.addEventListener('touchstart', triggerOk, { passive: false });
+                actionOkBtn.addEventListener('touchend', releaseOk, { passive: false });
+                actionOkBtn.addEventListener('mousedown', triggerOk);
+                actionOkBtn.addEventListener('mouseup', releaseOk);
+            }
+        }
+
         function parseCaptureConfig(inputStr) {
             if (!inputStr) return [1];
             return inputStr.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
         }
 
-        function triggerStrictImmersiveMode() {
-            try {
-                const doc = window.document;
-                const docEl = doc.documentElement;
-                const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-                
-                if (requestFullScreen) {
-                    requestFullScreen.call(docEl, { navigationUI: "hide" }).catch(err => {});
-                }
-            } catch (e) {}
-        }
-
-        document.addEventListener("DOMContentLoaded", triggerStrictImmersiveMode, { passive: true });
-        document.onreadystatechange = function () {
-            if (document.readyState === "interactive" || document.readyState === "complete") {
-                triggerStrictImmersiveMode();
-            }
-        };
-        window.addEventListener("load", triggerStrictImmersiveMode, { passive: true });
-        document.addEventListener("click", triggerStrictImmersiveMode, { passive: true });
-        document.addEventListener("touchstart", triggerStrictImmersiveMode, { passive: true });
-
-        function fireNativeFileSelector(targetInputId) {
-            triggerStrictImmersiveMode();
-            const nativeInputNode = document.getElementById(targetInputId);
-            if (nativeInputNode) {
-                nativeInputNode.click();
-            }
-        }
-
         function fetchImageFromUrl(inputId, modeKey) {
-            triggerStrictImmersiveMode();
             const targetUrl = document.getElementById(inputId).value.trim();
             if (!targetUrl) {
                 alert("Please paste a valid image URL first!");
                 return;
             }
-
-            const triggerBtnId = (modeKey === 'lock') ? "lock-btn-txt" : "home-btn-txt";
-            document.getElementById(triggerBtnId).textContent = "🔄 Downloading...";
 
             fetch(targetUrl)
                 .then(response => {
@@ -737,14 +760,14 @@
                 .then(blob => {
                     const reader = new FileReader();
                     reader.onloadend = function() {
-                        processImageStorageState(reader.result, modeKey);
+                        const base64Data = reader.result;
+                        processImageStorageState(base64Data, modeKey);
                         document.getElementById(inputId).value = "";
                     }
                     reader.readAsDataURL(blob);
                 })
                 .catch(error => {
                     alert("Download Failed: Link is protected or bad.");
-                    document.getElementById(triggerBtnId).textContent = "📁 Choose From Gallery";
                 });
         }
 
@@ -753,8 +776,12 @@
                 lockPreviewImg.src = dataString;
                 lockPreviewImg.style.display = "block";
                 lockPreviewSpan.style.display = "none";
-                document.getElementById("lock-btn-txt").textContent = "✓ Staged (Click Save)";
                 globalLockImgMemory = dataString;
+                applyLockBackground(dataString);
+                
+                // Active Fallback Cache Pipeline
+                localStorage.setItem("cache_local_lock_bg", dataString);
+                writeToAssetDatabase("lockScreenBg", dataString);
             } else if (modeKey === 'homescreen') {
                 homescreenPreviewImg.src = dataString;
                 homescreenPreviewImg.style.display = "block";
@@ -762,68 +789,134 @@
                 fakeHomescreenImage.src = dataString;
                 fakeHomescreenImage.style.display = "block";
                 viewPlaceholder.style.display = "none";
-                document.getElementById("home-btn-txt").textContent = "✓ Staged (Click Save)";
                 globalHomeImgMemory = dataString;
+                
+                // Active Fallback Cache Pipeline
+                localStorage.setItem("cache_local_home_bg", dataString);
+                writeToAssetDatabase("homeScreenImage", dataString);
             }
         }
 
         let db = null;
-        const dbRequest = indexedDB.open("MagicTrickAppDatabaseEngine", 2);
+        
+        // Wrapped Database Trigger logic so it safely fires after DOM elements map completely
+        function initIndexedDBStore() {
+            try {
+                const dbRequest = indexedDB.open("MagicTrickAppDatabaseEngine", 2);
 
-        dbRequest.onupgradeneeded = function(e) {
-            let database = e.target.result;
-            if (!database.objectStoreNames.contains("images")) {
-                database.createObjectStore("images");
+                dbRequest.onupgradeneeded = function(e) {
+                    let database = e.target.result;
+                    if (!database.objectStoreNames.contains("images")) {
+                        database.createObjectStore("images");
+                    }
+                };
+
+                dbRequest.onsuccess = function(e) {
+                    db = e.target.result;
+                    loadStoredAssetsFromDB();
+                };
+                
+                dbRequest.onerror = function() {
+                    loadFallbackCacheAssets();
+                };
+            } catch (err) {
+                loadFallbackCacheAssets();
             }
-        };
-
-        dbRequest.onsuccess = function(e) {
-            db = e.target.result;
-            loadStoredAssetsFromDB();
-        };
+        }
 
         function writeToAssetDatabase(key, valueString) {
             if (!db) return;
-            const transaction = db.transaction(["images"], "readwrite");
-            const store = transaction.objectStore("images");
-            store.put(valueString, key);
+            try {
+                const transaction = db.transaction(["images"], "readwrite");
+                const store = transaction.objectStore("images");
+                store.put(valueString, key);
+            } catch(e) {}
         }
 
         function loadStoredAssetsFromDB() {
-            if (!db) return;
-            const transaction = db.transaction(["images"], "readonly");
-            const store = transaction.objectStore("images");
+            if (!db) {
+                loadFallbackCacheAssets();
+                return;
+            }
+            try {
+                const transaction = db.transaction(["images"], "readonly");
+                const store = transaction.objectStore("images");
 
-            const getLockWall = store.get("lockScreenBg");
-            getLockWall.onsuccess = function() {
-                if (getLockWall.result) {
-                    globalLockImgMemory = getLockWall.result;
-                    applyLockBackground(globalLockImgMemory);
-                    lockPreviewImg.src = globalLockImgMemory;
-                    lockPreviewImg.style.display = "block";
-                    lockPreviewSpan.style.display = "none";
-                }
-            };
+                const getLockWall = store.get("lockScreenBg");
+                getLockWall.onsuccess = function() {
+                    if (getLockWall.result) {
+                        globalLockImgMemory = getLockWall.result;
+                        applyLockBackground(globalLockImgMemory);
+                        lockPreviewImg.src = globalLockImgMemory;
+                        lockPreviewImg.style.display = "block";
+                        lockPreviewSpan.style.display = "none";
+                    } else {
+                        loadIndividualLockFallback();
+                    }
+                };
+                getLockWall.onerror = loadIndividualLockFallback;
 
-            const getHomeScreenshot = store.get("homeScreenImage");
-            getHomeScreenshot.onsuccess = function() {
-                if (getHomeScreenshot.result) {
-                    globalHomeImgMemory = getHomeScreenshot.result;
-                    fakeHomescreenImage.src = globalHomeImgMemory;
-                    fakeHomescreenImage.style.display = "block";
-                    viewPlaceholder.style.display = "none";
-                    homescreenPreviewImg.src = globalHomeImgMemory;
-                    homescreenPreviewImg.style.display = "block";
-                    homescreenPreviewSpan.style.display = "none";
-                }
-            };
+                const getHomeScreenshot = store.get("homeScreenImage");
+                getHomeScreenshot.onsuccess = function() {
+                    if (getHomeScreenshot.result) {
+                        globalHomeImgMemory = getHomeScreenshot.result;
+                        fakeHomescreenImage.src = globalHomeImgMemory;
+                        fakeHomescreenImage.style.display = "block";
+                        viewPlaceholder.style.display = "none";
+                        homescreenPreviewImg.src = globalHomeImgMemory;
+                        homescreenPreviewImg.style.display = "block";
+                        homescreenPreviewSpan.style.display = "none";
+                    } else {
+                        loadIndividualHomeFallback();
+                    }
+                };
+                getHomeScreenshot.onerror = loadIndividualHomeFallback;
+            } catch(e) {
+                loadFallbackCacheAssets();
+            }
+        }
+        
+        function loadFallbackCacheAssets() {
+            loadIndividualLockFallback();
+            loadIndividualHomeFallback();
+        }
+        
+        function loadIndividualLockFallback() {
+            let localBackup = localStorage.getItem("cache_local_lock_bg");
+            if (localBackup) {
+                globalLockImgMemory = localBackup;
+                applyLockBackground(localBackup);
+                lockPreviewImg.src = localBackup;
+                lockPreviewImg.style.display = "block";
+                lockPreviewSpan.style.display = "none";
+            }
+        }
+        
+        function loadIndividualHomeFallback() {
+            let localBackup = localStorage.getItem("cache_local_home_bg");
+            if (localBackup) {
+                globalHomeImgMemory = localBackup;
+                fakeHomescreenImage.src = localBackup;
+                fakeHomescreenImage.style.display = "block";
+                viewPlaceholder.style.display = "none";
+                homescreenPreviewImg.src = localBackup;
+                homescreenPreviewImg.style.display = "block";
+                homescreenPreviewSpan.style.display = "none";
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Step 1: Always check fallback storage instantly so images map immediately
+            loadFallbackCacheAssets();
+            
+            // Step 2: Fire standard parameters mapping
             initLoadSavedConfig();
             buildPinDots();
             setupDoubleTapDetection();
-            triggerStrictImmersiveMode();
+            initializeHighSpeedKeypadListeners();
+            
+            // Step 3: Spin up IndexedDB asynchronously without blocking UI elements mapping
+            initIndexedDBStore();
         });
 
         function initLoadSavedConfig() {
@@ -856,7 +949,6 @@
         }
 
         function handleLockClick() {
-            triggerStrictImmersiveMode();
             lockClickCount++;
             clearTimeout(lockClickTimer);
             if (lockClickCount === 3) {
@@ -868,6 +960,7 @@
         }
 
         function buildPinDots() {
+            if (!dotsContainer) return;
             dotsContainer.innerHTML = "";
             let currentCheckingAttempt = runAttemptCounter + 1;
             let isUnlockAttempt = (currentCheckingAttempt === universalUnlockAttempt);
@@ -886,7 +979,6 @@
         }
 
         function switchView(viewId) {
-            triggerStrictImmersiveMode();
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById(viewId).classList.remove('hidden');
             if(viewId === 'lock-screen') {
@@ -896,6 +988,7 @@
         }
 
         function evaluateKeypadLayoutState() {
+            if (!actionOkBtn) return;
             let currentCheckingAttempt = runAttemptCounter + 1;
             if (currentCheckingAttempt === universalUnlockAttempt && activeEffectMode === "1") {
                 actionOkBtn.classList.add("visible");
@@ -905,11 +998,8 @@
         }
 
         function pressNum(num) {
-            if(event) event.preventDefault();
-            triggerStrictImmersiveMode();
             let currentCheckingAttempt = runAttemptCounter + 1;
             const isUnlockAttempt = (currentCheckingAttempt === universalUnlockAttempt);
-            
             const isForcedVisual = isUnlockAttempt && (activeEffectMode === "1");
             const maxLength = isForcedVisual ? 12 : targetPin.length;
 
@@ -936,8 +1026,6 @@
         }
 
         function handleActionKey() {
-            if(event) event.preventDefault();
-            triggerStrictImmersiveMode();
             let currentCheckingAttempt = runAttemptCounter + 1;
             if (currentCheckingAttempt === universalUnlockAttempt && activeEffectMode === "1") {
                 if (currentInput.length > 0) {
@@ -946,8 +1034,7 @@
             }
         }
 
-        function backspace(e) {
-            if(e) e.preventDefault();
+        function backspace() {
             currentInput = currentInput.slice(0, -1);
             updateDots();
         }
@@ -1028,6 +1115,7 @@
         }
 
         function formatDisplayPeekPopup() {
+            if (!peekPopup) return;
             if (activeEffectMode === "1") {
                 peekPopup.textContent = computedOutputResult;
             } else {
@@ -1052,6 +1140,7 @@
                 lockScreen.classList.remove("shake");
                 lockInstruction.textContent = "Enter PIN";
                 clearPin();
+                disabledKeypadInputState = false;
                 evaluateKeypadLayoutState();
             }, 360);
         }
@@ -1063,7 +1152,6 @@
 
         function startPeekTrack(e) {
             if (e.target.id === "reset-touch-zone") return;
-            triggerStrictImmersiveMode();
             clearTimeout(peekTimer);
             peekTimer = setTimeout(() => {
                 peekPopup.classList.add("visible");
@@ -1086,19 +1174,10 @@
                 lastResetTapTime = currentTime;
             };
 
-            resetTouchZone.addEventListener("touchstart", handleResetTap, { passive: false });
-            resetTouchZone.addEventListener("mousedown", handleResetTap, { passive: false });
-        }
-
-        function handleImageUpload(event, modeKey) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                processImageStorageState(e.target.result, modeKey);
-            };
-            reader.readAsDataURL(file);
+            if (resetTouchZone) {
+                resetTouchZone.addEventListener("touchstart", handleResetTap, { passive: false });
+                resetTouchZone.addEventListener("mousedown", handleResetTap, { passive: false });
+            }
         }
 
         function applyLockBackground(bgDataString) {
@@ -1108,19 +1187,6 @@
         }
 
         function saveSettings() {
-            if (globalLockImgMemory) {
-                applyLockBackground(globalLockImgMemory);
-                writeToAssetDatabase("lockScreenBg", globalLockImgMemory);
-                document.getElementById("lock-btn-txt").textContent = "📁 Choose From Gallery";
-            }
-            if (globalHomeImgMemory) {
-                fakeHomescreenImage.src = globalHomeImgMemory;
-                fakeHomescreenImage.style.display = "block";
-                viewPlaceholder.style.display = "none";
-                writeToAssetDatabase("homeScreenImage", globalHomeImgMemory);
-                document.getElementById("home-btn-txt").textContent = "📁 Choose From Gallery";
-            }
-
             activeEffectMode = document.getElementById("app-effect-mode").value;
             universalUnlockAttempt = parseInt(document.getElementById("perf-unlock-attempt-input").value) || 2;
             
@@ -1149,15 +1215,17 @@
                 localStorage.removeItem("app_captured_attempts_obj");
             }
 
-            const val = newPinInput.value.trim();
-            if (val !== "") {
-                if(val.length >= 4 && val.length <= 6 && /^\d+$/.test(val)) {
-                    targetPin = val;
-                    localStorage.setItem("app_pin", val);
-                    newPinInput.value = "";
-                } else {
-                    alert("Error: PIN code must be between 4 and 6 digits.");
-                    return;
+            if (newPinInput) {
+                const val = newPinInput.value.trim();
+                if (val !== "") {
+                    if(val.length >= 4 && val.length <= 6 && /^\d+$/.test(val)) {
+                        targetPin = val;
+                        localStorage.setItem("app_pin", val);
+                        newPinInput.value = "";
+                    } else {
+                        alert("Error: PIN code must be between 4 and 6 digits.");
+                        return;
+                    }
                 }
             }
 
