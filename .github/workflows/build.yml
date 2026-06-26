@@ -31,20 +31,20 @@ jobs:
       - name: Install Cordova Framework
         run: npm install -g cordova
 
-      - name: Generate Local Android Project
+      - name: Initialize and Build Standalone App
         run: |
-          cordova create magic-app com.mentalist.lock "Lock"
-          cd magic-app
+          # Create the project safely using unique arguments
+          cordova create outputapp com.mentalist.lock "Lock"
+          cd outputapp
+          
+          # Add standard android engine
           cordova platform add android --no-telemetry
-
-      - name: Process Custom Application Icon
-        run: |
-          # Safely process the flat icon vector into a master app image
-          convert -background none -size 512x512 icon.svg magic-app/icon.png
-
-      - name: Generate Perfect Clean System Configuration
-        run: |
-          cat << 'EOF' > magic-app/config.xml
+          
+          # Process the flat vector icon inside the asset pool safely
+          convert -background none -size 512x512 ../icon.svg icon.png
+          
+          # Rebuild clean validated system configuration file
+          cat << 'EOF' > config.xml
           <?xml version='1.0' encoding='utf-8'?>
           <widget id="com.mentalist.lock" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
               <name>Lock</name>
@@ -66,19 +66,15 @@ jobs:
               </platform>
           </widget>
           EOF
-
-      - name: Inject Offline Application Assets
-        run: |
-          rm -rf magic-app/www/*
-          cp index.html magic-app/www/index.html
-
-      - name: Compile Production APK Package
-        run: |
-          cd magic-app
+          
+          # Drop your index.html directly into the workspace root
+          cp ../index.html www/index.html
+          
+          # Compile native debug binary package
           cordova build android --debug --device
 
       - name: Deploy Standalone APK Artifact to GitHub
         uses: actions/upload-artifact@v4
         with:
           name: Offline-Lock-App
-          path: magic-app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          path: outputapp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
