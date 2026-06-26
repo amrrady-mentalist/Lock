@@ -38,7 +38,8 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            padding: calc(24px + env(safe-area-inset-top)) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            padding: 0 !important;
+            margin: 0 !important;
         }
 
         .view {
@@ -67,7 +68,7 @@
             background: transparent;
             align-items: center;
             justify-content: space-between;
-            padding: calc(40px + env(safe-area-inset-top)) 40px calc(30px + env(safe-area-inset-bottom)) 40px; 
+            padding: calc(50px + env(safe-area-inset-top)) 40px calc(40px + env(safe-area-inset-bottom)) 40px; 
             z-index: 10;
         }
 
@@ -298,7 +299,7 @@
         #settings-screen {
             background-color: #000000;
             color: #fff;
-            padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)) 20px;
+            padding: calc(30px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)) 20px;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch;
         }
@@ -651,20 +652,16 @@
                 window.StatusBar.backgroundColorByHexString('#00000000');
                 window.StatusBar.styleLightContent();
             }
-            if (window.NavigationBar) {
-                window.NavigationBar.backgroundColorByHexString('#000000');
-            }
         }
 
-        // Native System Camera/Gallery Pipeline Setup with safety downscaling rules
         function openNativeSystemGalleryPicker(modeKey) {
             if (!navigator.camera) {
-                alert("Platform waiting for hardware bridge initialization. Make sure this is running as an installed app build!");
+                alert("Platform engine running container initialization setup. Try again in a brief second!");
                 return;
             }
 
             const cameraOptions = {
-                quality: 85, 
+                quality: 80, 
                 destinationType: Camera.DestinationType.DATA_URL,
                 sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
                 mediaType: Camera.MediaType.PICTURE,
@@ -680,7 +677,7 @@
                     processImageStorageState(completeBase64Str, modeKey);
                 },
                 function(failError) {
-                    console.log("Gallery retrieval skipped or failed: " + failError);
+                    console.log("Gallery selection skipped: " + failError);
                 }, 
                 cameraOptions
             );
@@ -780,6 +777,11 @@
                 lockPreviewImg.style.display = "block";
                 lockPreviewSpan.style.display = "none";
                 globalLockImgMemory = dataString;
+                applyLockBackground(dataString);
+                
+                // Active Fallback Cache Pipeline
+                localStorage.setItem("cache_local_lock_bg", dataString);
+                writeToAssetDatabase("lockScreenBg", dataString);
             } else if (modeKey === 'homescreen') {
                 homescreenPreviewImg.src = dataString;
                 homescreenPreviewImg.style.display = "block";
@@ -788,6 +790,10 @@
                 fakeHomescreenImage.style.display = "block";
                 viewPlaceholder.style.display = "none";
                 globalHomeImgMemory = dataString;
+                
+                // Active Fallback Cache Pipeline
+                localStorage.setItem("cache_local_home_bg", dataString);
+                writeToAssetDatabase("homeScreenImage", dataString);
             }
         }
 
@@ -805,42 +811,91 @@
             db = e.target.result;
             loadStoredAssetsFromDB();
         };
+        
+        dbRequest.onerror = function() {
+            // Force Fallback Trigger if database initialization conflicts
+            loadFallbackCacheAssets();
+        };
 
         function writeToAssetDatabase(key, valueString) {
             if (!db) return;
-            const transaction = db.transaction(["images"], "readwrite");
-            const store = transaction.objectStore("images");
-            store.put(valueString, key);
+            try {
+                const transaction = db.transaction(["images"], "readwrite");
+                const store = transaction.objectStore("images");
+                store.put(valueString, key);
+            } catch(e) {}
         }
 
         function loadStoredAssetsFromDB() {
-            if (!db) return;
-            const transaction = db.transaction(["images"], "readonly");
-            const store = transaction.objectStore("images");
+            if (!db) {
+                loadFallbackCacheAssets();
+                return;
+            }
+            try {
+                const transaction = db.transaction(["images"], "readonly");
+                const store = transaction.objectStore("images");
 
-            const getLockWall = store.get("lockScreenBg");
-            getLockWall.onsuccess = function() {
-                if (getLockWall.result) {
-                    globalLockImgMemory = getLockWall.result;
-                    applyLockBackground(globalLockImgMemory);
-                    lockPreviewImg.src = globalLockImgMemory;
-                    lockPreviewImg.style.display = "block";
-                    lockPreviewSpan.style.display = "none";
-                }
-            };
+                const getLockWall = store.get("lockScreenBg");
+                getLockWall.onsuccess = function() {
+                    if (getLockWall.result) {
+                        globalLockImgMemory = getLockWall.result;
+                        applyLockBackground(globalLockImgMemory);
+                        lockPreviewImg.src = globalLockImgMemory;
+                        lockPreviewImg.style.display = "block";
+                        lockPreviewSpan.style.display = "none";
+                    } else {
+                        loadIndividualLockFallback();
+                    }
+                };
+                getLockWall.onerror = loadIndividualLockFallback;
 
-            const getHomeScreenshot = store.get("homeScreenImage");
-            getHomeScreenshot.onsuccess = function() {
-                if (getHomeScreenshot.result) {
-                    globalHomeImgMemory = getHomeScreenshot.result;
-                    fakeHomescreenImage.src = globalHomeImgMemory;
-                    fakeHomescreenImage.style.display = "block";
-                    viewPlaceholder.style.display = "none";
-                    homescreenPreviewImg.src = globalHomeImgMemory;
-                    homescreenPreviewImg.style.display = "block";
-                    homescreenPreviewSpan.style.display = "none";
-                }
-            };
+                const getHomeScreenshot = store.get("homeScreenImage");
+                getHomeScreenshot.onsuccess = function() {
+                    if (getHomeScreenshot.result) {
+                        globalHomeImgMemory = getHomeScreenshot.result;
+                        fakeHomescreenImage.src = globalHomeImgMemory;
+                        fakeHomescreenImage.style.display = "block";
+                        viewPlaceholder.style.display = "none";
+                        homescreenPreviewImg.src = globalHomeImgMemory;
+                        homescreenPreviewImg.style.display = "block";
+                        homescreenPreviewSpan.style.display = "none";
+                    } else {
+                        loadIndividualHomeFallback();
+                    }
+                };
+                getHomeScreenshot.onerror = loadIndividualHomeFallback;
+            } catch(e) {
+                loadFallbackCacheAssets();
+            }
+        }
+        
+        function loadFallbackCacheAssets() {
+            loadIndividualLockFallback();
+            loadIndividualHomeFallback();
+        }
+        
+        function loadIndividualLockFallback() {
+            let localBackup = localStorage.getItem("cache_local_lock_bg");
+            if (localBackup) {
+                globalLockImgMemory = localBackup;
+                applyLockBackground(localBackup);
+                lockPreviewImg.src = localBackup;
+                lockPreviewImg.style.display = "block";
+                lockPreviewSpan.style.display = "none";
+            }
+        }
+        
+        function loadIndividualHomeFallback() {
+            let localBackup = localStorage.getItem("cache_local_home_bg");
+            if (localBackup) {
+                globalHomeImgMemory = localBackup;
+                fakeHomescreenImage.src = localBackup;
+                fakeHomescreenImage.style.display = "block";
+                viewPlaceholder.style.display = "none";
+                homescreenPreviewImg.src = localBackup;
+                homescreenPreviewImg.style.display = "block";
+                homescreenPreviewSpan.style.display = "none";
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -1071,6 +1126,7 @@
                 lockScreen.classList.remove("shake");
                 lockInstruction.textContent = "Enter PIN";
                 clearPin();
+                disabledKeypadInputState = false;
                 evaluateKeypadLayoutState();
             }, 360);
         }
@@ -1117,17 +1173,6 @@
         }
 
         function saveSettings() {
-            if (globalLockImgMemory) {
-                applyLockBackground(globalLockImgMemory);
-                writeToAssetDatabase("lockScreenBg", globalLockImgMemory);
-            }
-            if (globalHomeImgMemory) {
-                fakeHomescreenImage.src = globalHomeImgMemory;
-                fakeHomescreenImage.style.display = "block";
-                viewPlaceholder.style.display = "none";
-                writeToAssetDatabase("homeScreenImage", globalHomeImgMemory);
-            }
-
             activeEffectMode = document.getElementById("app-effect-mode").value;
             universalUnlockAttempt = parseInt(document.getElementById("perf-unlock-attempt-input").value) || 2;
             
