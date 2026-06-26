@@ -38,7 +38,6 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            /* Added padding-top to account for the transparent status bar overlay */
             padding: calc(24px + env(safe-area-inset-top)) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
@@ -179,7 +178,6 @@
             will-change: background-color, box-shadow, transform;
         }
 
-        /* JAVASCRIPT TRIGGERED HIGH-CONTRAST GLOW CLASS */
         .key.glowing {
             transform: scale(0.90);
             background-color: rgba(255, 255, 255, 0.35) !important;
@@ -364,7 +362,6 @@
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        /* NATIVE STORAGE INTERACTION ROW */
         .native-system-gallery-row {
             background: #11111e;
             border: 1px dashed #3f3f74;
@@ -597,7 +594,6 @@
         </div>
     </div>
 
-    <!-- Include Cordova scripts to handle native hooks -->
     <script src="cordova.js"></script>
     <script>
         let currentInput = "";
@@ -647,11 +643,9 @@
         const peekPopup = document.getElementById("peek-popup");
         const resetTouchZone = document.getElementById("reset-touch-zone");
 
-        // Cordova Initialization Engine
         document.addEventListener("deviceready", onDeviceReady, false);
 
         function onDeviceReady() {
-            // Apply absolute transparency configuration to the status bar natively
             if (window.StatusBar) {
                 window.StatusBar.overlaysWebView(true);
                 window.StatusBar.backgroundColorByHexString('#00000000');
@@ -662,7 +656,7 @@
             }
         }
 
-        // Native System Camera/Gallery Pipeline Setup
+        // Native System Camera/Gallery Pipeline Setup with safety downscaling rules
         function openNativeSystemGalleryPicker(modeKey) {
             if (!navigator.camera) {
                 alert("Platform waiting for hardware bridge initialization. Make sure this is running as an installed app build!");
@@ -670,12 +664,14 @@
             }
 
             const cameraOptions = {
-                quality: 90,
+                quality: 85, 
                 destinationType: Camera.DestinationType.DATA_URL,
                 sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
                 mediaType: Camera.MediaType.PICTURE,
                 encodingType: Camera.EncodingType.JPEG,
-                correctOrientation: true
+                correctOrientation: true,
+                targetWidth: 1080,  
+                targetHeight: 1920  
             };
 
             navigator.camera.getPicture(
@@ -690,7 +686,6 @@
             );
         }
 
-        // HIGH-SPEED HARDWARE ACCELERATED TOUCH EVENTS IMPLEMENTATION FOR KEYPAD GLOW EFFECT
         function initializeHighSpeedKeypadListeners() {
             const digitKeys = document.querySelectorAll('.key');
             digitKeys.forEach(keyBtn => {
@@ -715,7 +710,6 @@
                 keyBtn.addEventListener('mouseleave', releasePress);
             });
 
-            // Set up Delete Action Label Layout Button Hooks
             if (actionKeyBtn) {
                 const triggerDel = function(e) {
                     e.preventDefault();
@@ -732,7 +726,6 @@
                 actionKeyBtn.addEventListener('mouseup', releaseDel);
             }
 
-            // Set up OK Action Label Layout Button Hooks
             if (actionOkBtn) {
                 const triggerOk = function(e) {
                     e.preventDefault();
@@ -938,7 +931,6 @@
         function pressNum(num) {
             let currentCheckingAttempt = runAttemptCounter + 1;
             const isUnlockAttempt = (currentCheckingAttempt === universalUnlockAttempt);
-            
             const isForcedVisual = isUnlockAttempt && (activeEffectMode === "1");
             const maxLength = isForcedVisual ? 12 : targetPin.length;
 
