@@ -28,184 +28,1122 @@
             min-height: 100% !important;
             overflow: hidden !important;
             position: fixed !important;
-            top: 0; left: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background-color: #000000;
-            color: #ffffff;
+            overscroll-behavior: none !important;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        /* View Layouts */
-        .view-panel {
-            display: none;
-            width: 100%;
-            height: 100%;
+        body {
+            background: linear-gradient(145deg, #09090e 0%, #151124 35%, #471020 65%, #0f2347 100%);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .view {
             position: absolute;
-            top: 0;
-            left: 0;
-            overflow-y: auto;
-            padding: 20px;
-            padding-top: calc(20px + env(safe-area-inset-top));
+            top: 0; left: 0;
+            width: 100%; 
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 1;
+            box-sizing: border-box;
+            overflow: hidden;
+            will-change: opacity, transform;
+            background: transparent; /* Changed from solid black to prevent black background flashing during transitions */
         }
 
-        .view-panel.active {
-            display: block;
+        .view.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.02);
         }
 
-        /* Simple styling for configuration controls */
-        .config-group {
-            margin-bottom: 15px;
+        /* --- LOCK SCREEN --- */
+        #lock-screen {
+            background: transparent;
+            align-items: center;
+            justify-content: space-between;
+            padding: calc(40px + env(safe-area-inset-top)) 40px calc(30px + env(safe-area-inset-bottom)) 40px; 
+            z-index: 10;
         }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: #aaaaaa;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            background: #121212;
-            border: 1px solid #333333;
-            color: #ffffff;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: #ffffff;
-            color: #000000;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
+        .lock-header {
+            text-align: center;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             margin-top: 20px;
         }
 
-        /* Minimal styling for Lock Screen UI placeholder */
-        #lock-screen-view {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: #000000;
+        .lock-svg-container {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.25));
+            opacity: 0.95;
+            cursor: pointer;
+        }
+
+        .lock-svg-container svg {
+            width: 100%;
+            height: 100%;
+            fill: #ffffff;
         }
 
         .lock-status {
             font-size: 18px;
-            margin-bottom: 30px;
-            color: #888888;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            color: #ffffff;
+            transition: color 0.1s ease;
         }
+
+        .pin-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            min-height: 14px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.15s ease;
+            will-change: background-color, transform, box-shadow;
+        }
+
+        .dot.filled {
+            background: #fff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
+            transform: scale(1.15);
+        }
+        
+        .dot.error {
+            background: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
+        }
+
+        .dot.forced-mode {
+            background: #ffffff;
+            border: 1px dashed rgba(255, 255, 255, 0.6);
+            box-shadow: none;
+        }
+
+        /* --- KEYPAD SYSTEM --- */
+        .keypad-container {
+            width: 100%;
+            max-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 40px;
+            touch-action: manipulation;
+        }
+
+        .keypad-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .key {
+            position: relative;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(25px) saturate(160%);
+            -webkit-backdrop-filter: blur(25px) saturate(160%);
+            color: #fff;
+            font-size: 30px;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden; 
+            transition: transform 0.05s ease, border-color 0.1s ease;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 6px 20px rgba(0, 0, 0, 0.3);
+            will-change: transform, border-color;
+        }
+
+        .bottom-side-space {
+            width: 75px;
+            height: 72px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .action-label-btn {
+            text-align: center;
+            letter-spacing: 0.2px;
+            color: rgba(255, 255, 255, 0.6) !important;
+            font-size: 16px;
+            font-weight: 400;
+            transition: opacity 0.05s, transform 0.05s;
+            will-change: opacity, transform;
+        }
+
+        .action-label-btn:active {
+            transform: scale(0.92);
+            opacity: 0.5;
+        }
+
+        #action-ok-btn {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+        }
+
+        #action-ok-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .key::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0);
+            transition: background-color 0.05s ease;
+            pointer-events: none;
+        }
+
+        .key:active {
+            transform: scale(0.94);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .key:active::after {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .shake {
+            animation: shake 0.35s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* --- REVEAL VIEW --- */
+        #fake-homescreen-view {
+            background-color: #000000;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        #fake-homescreen-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .placeholder-text {
+            color: #555;
+            font-size: 16px;
+            text-align: center;
+            padding: 25px;
+            line-height: 1.4;
+        }
+
+        .bottom-reset-trigger-pad {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 18%;
+            z-index: 110;
+            background: transparent;
+        }
+
+        /* PEEK POPUP */
+        #peek-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px 40px;
+            border-radius: 16px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.12s ease;
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
+            line-height: 1.4;
+        }
+
+        #peek-popup.visible {
+            opacity: 1;
+        }
+
+        /* --- SETTINGS SCREEN --- */
+        #settings-screen {
+            background-color: #000000;
+            color: #fff;
+            padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)) 20px;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .settings-group {
+            margin-top: 15px;
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .settings-group label {
+            display: block;
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .settings-group input[type="text"],
+        .settings-group input[type="number"],
+        .settings-group input[type="url"] {
+            width: 100%;
+            background: #141414;
+            border: 1px solid #262626;
+            color: #fff;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            outline: none;
+            text-align: center;
+            user-select: text !important;
+            -webkit-user-select: text !important;
+        }
+
+        /* --- MODERN CUSTOM DROP-DOWN DROPDOWN SYSTEM --- */
+        .select-input-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .settings-group select {
+            width: 100%;
+            background: linear-gradient(135deg, #161616 0%, #111111 100%);
+            border: 1px solid #2a2a2a;
+            color: #ffffff;
+            padding: 14px 40px 14px 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            text-align: center;
+            text-align-last: center;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .settings-group select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .select-input-wrapper::after {
+            content: "";
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #888888;
+            pointer-events: none;
+        }
+
+        .url-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .url-input-container input[type="url"] {
+            margin-bottom: 0 !important;
+            text-align: left !important;
+            padding: 10px 14px;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .btn-inline-fetch {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-inline-fetch:active { background: #1d4ed8; }
+
+        .solid-gallery-trigger-btn {
+            display: block;
+            width: 100%;
+            height: 54px;
+            background: #1a1a2e;
+            border: 1px solid #3f3f74;
+            color: #8fa0ff;
+            line-height: 52px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: background-color 0.1s;
+        }
+        
+        .solid-gallery-trigger-btn:active { background-color: #252542; }
+
+        .hidden-system-input {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            width: 0px !important;
+            height: 0px !important;
+        }
+
+        .preview-container {
+            width: 100%;
+            height: 100px;
+            border-radius: 8px;
+            background: #141414;
+            border: 1px solid #262626;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: #444;
+            font-size: 13px;
+        }
+
+        .preview-container img {
+            width: 100%; height: 100%;
+            object-fit: cover; display: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+        }
+
+        .btn-primary { background: #fff; color: #000; margin-bottom: 10px; }
+        .btn-secondary { background: transparent; color: #888; border: 1px solid #262626; }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            background: #141414;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #262626;
+        }
+        .toggle-container label { margin-bottom: 0; text-transform: none; font-size: 15px; color: #fff;}
+        .toggle-container input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="lock-screen-view" class="view-panel active">
-        <div style="margin: auto;">
-            <div class="lock-status">Device Locked</div>
-            <p style="color: #444; font-size: 12px;">Tap target area to trigger secret workflows</p>
-            <button onclick="switchView('config-screen')" style="background: #222; color: #fff; width: auto; padding: 10px 20px; font-size: 14px;">Open Settings</button>
+    <div id="lock-screen" class="view">
+        <div class="lock-header">
+            <div class="lock-svg-container" onclick="handleLockClick()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C9.24 2 7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2h-1V7c0-2.76-2.24-5-5-5zm0 2c1.66 0 3 1.34 3 3v3H9V7c0-1.66 1.34-3 3-3zm0 10c1.1 0 2 .9 2 2s-.9 2-2 2s-2-.9-2-2s.9-2 2-2z"/>
+                </svg>
+            </div>
+            <div class="lock-status" id="lock-instruction">Enter PIN</div>
+            <div class="pin-dots" id="dots-container"></div>
+        </div>
+
+        <div class="keypad-container">
+            <div class="keypad-row">
+                <div class="key" ontouchstart="pressNum('1')" onmousedown="pressNum('1')">1</div>
+                <div class="key" ontouchstart="pressNum('2')" onmousedown="pressNum('2')">2</div>
+                <div class="key" ontouchstart="pressNum('3')" onmousedown="pressNum('3')">3</div>
+            </div>
+            <div class="keypad-row">
+                <div class="key" ontouchstart="pressNum('4')" onmousedown="pressNum('4')">4</div>
+                <div class="key" ontouchstart="pressNum('5')" onmousedown="pressNum('5')">5</div>
+                <div class="key" ontouchstart="pressNum('6')" onmousedown="pressNum('6')">6</div>
+            </div>
+            <div class="keypad-row">
+                <div class="key" ontouchstart="pressNum('7')" onmousedown="pressNum('7')">7</div>
+                <div class="key" ontouchstart="pressNum('8')" onmousedown="pressNum('8')">8</div>
+                <div class="key" ontouchstart="pressNum('9')" onmousedown="pressNum('9')">9</div>
+            </div>
+            <div class="keypad-row">
+                <div class="bottom-side-space action-label-btn" id="action-ok-btn" ontouchstart="handleActionKey()" onmousedown="handleActionKey()">OK</div>
+                <div class="key" ontouchstart="pressNum('0')" onmousedown="pressNum('0')">0</div>
+                <div class="bottom-side-space action-label-btn" id="action-key-btn" ontouchstart="backspace(event)" onmousedown="backspace(event)">Delete</div>
+            </div>
         </div>
     </div>
 
-    <div id="config-screen" class="view-panel">
-        <h2>Configuration Panel</h2>
-        <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Adjust system triggers and state behaviors</p>
+    <div id="fake-homescreen-view" class="view hidden" onmousedown="startPeekTrack(event)" onmouseup="endPeekTrack()" ontouchstart="startPeekTrack(event)" ontouchend="endPeekTrack()">
+        <img id="fake-homescreen-image" alt="Fake Home Screen ScreenShot">
+        <div id="view-placeholder" class="placeholder-text">No home screen screenshot uploaded yet. Triple click lock icon to configure.</div>
+        
+        <div class="bottom-reset-trigger-pad" id="reset-touch-zone"></div>
+        
+        <div id="peek-popup">0</div>
+    </div>
 
-        <div class="config-group">
-            <label for="effect-mode-select">Active Effect Mode</label>
-            <select id="effect-mode-select">
-                <option value="1">Mode 1: Instant Reset</option>
-                <option value="2">Mode 2: Persistent State</option>
-            </select>
+    <div id="settings-screen" class="view hidden">
+        <header style="padding-bottom: 10px; border-bottom: 1px solid #1a1a1a; margin-bottom: 10px;">
+            <h1>Hidden Config</h1>
+        </header>
+
+        <div class="settings-group">
+            <label>1. Lock Screen Background</label>
+            <div class="solid-gallery-trigger-btn" id="lock-btn-txt" onclick="fireNativeFileSelector('lock-bg-input')">📁 Choose From Gallery</div>
+            <input type="file" id="lock-bg-input" class="hidden-system-input" accept="image/*" onchange="handleImageUpload(event, 'lock')">
+            
+            <div class="url-input-container">
+                <input type="url" id="lock-url-input" placeholder="Or paste direct image URL (.jpg/.png)">
+                <button type="button" class="btn-inline-fetch" onclick="fetchImageFromUrl('lock-url-input', 'lock')">Fetch</button>
+            </div>
+
+            <div class="preview-container" id="lock-preview-box">
+                <span>Using default glass gradient</span>
+                <img id="lock-preview-img" alt="Lock screen wallpaper preview">
+            </div>
         </div>
 
-        <div class="config-group">
-            <label for="unlock-attempt-input">Universal Unlock Code</label>
-            <input type="text" id="unlock-attempt-input" value="0000">
+        <div class="settings-group">
+            <label>2. Home Screen Screenshot Image</label>
+            <div class="solid-gallery-trigger-btn" id="home-btn-txt" onclick="fireNativeFileSelector('homescreen-img-input')">📁 Choose From Gallery</div>
+            <input type="file" id="homescreen-img-input" class="hidden-system-input" accept="image/*" onchange="handleImageUpload(event, 'homescreen')">
+            
+            <div class="url-input-container">
+                <input type="url" id="home-url-input" placeholder="Or paste direct image URL (.jpg/.png)">
+                <button type="button" class="btn-inline-fetch" onclick="fetchImageFromUrl('home-url-input', 'homescreen')">Fetch</button>
+            </div>
+
+            <div class="preview-container" id="homescreen-preview-box">
+                <span>No screenshot loaded</span>
+                <img id="homescreen-preview-img" alt="Fake homescreen reveal preview">
+            </div>
         </div>
 
-        <div class="config-group">
-            <label for="capture-attempts-config">Capture Configuration</label>
-            <input type="text" id="capture-attempts-config" value="default_raw">
+        <div class="settings-group">
+            <label for="app-effect-mode">Active Magic Effect Mode</label>
+            <div class="select-input-wrapper">
+                <select id="app-effect-mode" onchange="toggleEffectSettingPanels()">
+                    <option value="1">Effect 1</option>
+                    <option value="2">Effect 2</option>
+                </select>
+            </div>
+
+            <label for="perf-unlock-attempt-input">Universal Bypass Unlock Target Attempt</label>
+            <input type="number" id="perf-unlock-attempt-input" placeholder="e.g. 2 for 2nd attempt" min="1">
+
+            <div id="panel-effect-1-fields">
+                <label for="perf-year-input">Effect 1: 1st Field (Year)</label>
+                <input type="number" id="perf-year-input" placeholder="Enter Year value (e.g. 2026)">
+
+                <label for="perf-date-input">Effect 1: 2nd Field (Date or Number)</label>
+                <input type="number" id="perf-date-input" placeholder="Enter Date/Number custom factor">
+            </div>
+
+            <div id="panel-effect-2-fields" style="display: none;">
+                <label for="perf-capture-attempts-input">Effect 2: Secret Capture Log Attempts</label>
+                <input type="text" id="perf-capture-attempts-input" placeholder="e.g. 1 or 1,2 for multiple capture checkpoints">
+            </div>
         </div>
 
-        <div class="config-group">
-            <label for="factor-year-input">Performance Factor (Year)</label>
-            <input type="number" id="factor-year-input" value="2026">
+        <div class="settings-group">
+            <label>Universal Background API Sync Engine</label>
+            <div class="toggle-container">
+                <label for="api-active-toggle">Enable Real-time Webhook Transmission</label>
+                <input type="checkbox" id="api-active-toggle">
+            </div>
+            <label for="api-url-endpoint">External API Endpoint URL</label>
+            <input type="url" id="api-url-endpoint" placeholder="https://yourserver.com/api/peek" style="text-align: left !important;">
         </div>
 
-        <div class="config-group">
-            <label for="factor-date-num-input">Performance Factor (Date Number)</label>
-            <input type="number" id="factor-date-num-input" value="1">
+        <div class="settings-group">
+            <label for="peek-hold-input">Peek Long-Press Hold Duration (Seconds)</label>
+            <input type="number" id="peek-hold-input" min="1" max="10" step="1" value="3" placeholder="Seconds to hold screen">
         </div>
 
-        <div class="config-group">
-            <label for="peek-hold-input">Peek Hold Time (Seconds)</label>
-            <input type="number" id="peek-hold-input" value="3">
+        <div class="settings-group">
+            <label for="new-pin-input">Standard Security PIN (4-6 Digits)</label>
+            <input type="text" id="new-pin-input" pattern="[0-9]*" inputmode="numeric" maxlength="6" placeholder="Leave empty to keep current">
+            
+            <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+            <button class="btn btn-secondary" onclick="switchView('lock-screen')">Exit to Lockscreen</button>
         </div>
-
-        <div class="config-group">
-            <label for="api-sync-select">API Synchronization</label>
-            <select id="api-sync-select">
-                <option value="false">Disabled</option>
-                <option value="true">Enabled</option>
-            </select>
-        </div>
-
-        <div class="config-group">
-            <label for="api-url-input">API Endpoint URL</label>
-            <input type="text" id="api-url-input" value="https://api.example.com/sync">
-        </div>
-
-        <div class="config-group">
-            <label for="new-pin-input">Update Target PIN (Leave blank to keep current)</label>
-            <input type="password" id="new-pin-input" placeholder="Enter 4-6 digit PIN" pattern="\d*">
-        </div>
-
-        <button onclick="saveConfiguration()">Save & Activate Configuration</button>
     </div>
 
     <script>
-        // Global State Defaults
+        let currentInput = "";
         let targetPin = localStorage.getItem("app_pin") || "1234";
-        let runAttemptCounter = 0;
-        let capturedAttemptsObject = {};
+        
+        let globalLockImgMemory = "";
+        let globalHomeImgMemory = "";
 
-        // Navigation Engine
-        function switchView(viewId) {
-            document.querySelectorAll('.view-panel').forEach(panel => {
-                panel.classList.remove('active');
-            });
-            const targetPanel = document.getElementById(viewId + "-view") || document.getElementById(viewId);
-            if(targetPanel) {
-                targetPanel.classList.add('active');
-                targetPanel.scrollTop = 0;
+        let runAttemptCounter = 0; 
+        let activeEffectMode = localStorage.getItem("app_active_effect_mode") || "1";
+        
+        let universalUnlockAttempt = parseInt(localStorage.getItem("app_universal_unlock_attempt")) || 2;
+        let targetCaptureAttemptsArray = parseCaptureConfig(localStorage.getItem("app_perf_capture_attempts") || "1");
+        
+        let factorYear = parseInt(localStorage.getItem("app_perf_year")) || 0;
+        let factorDateNum = parseInt(localStorage.getItem("app_perf_date_num")) || 0;
+        let computedOutputResult = localStorage.getItem("app_computed_result") || "0";
+        
+        let capturedAttemptsObject = JSON.parse(localStorage.getItem("app_captured_attempts_obj")) || {};
+        
+        let apiSyncEnabled = localStorage.getItem("app_api_sync_enabled") === "true";
+        let apiUrlEndpoint = localStorage.getItem("app_api_url_endpoint") || "";
+
+        let peekHoldSecs = parseInt(localStorage.getItem("app_peek_hold_time")) || 3;
+        let peekTimer = null;
+
+        let lockClickCount = 0;
+        let lockClickTimer = null;
+        
+        let lastResetTapTime = 0;
+
+        const lockScreen = document.getElementById("lock-screen");
+        const dotsContainer = document.getElementById("dots-container");
+        const lockInstruction = document.getElementById("lock-instruction");
+        
+        // CRITICAL CRASH PROTECTION: Safer declaration block
+        const newPinInput = document.getElementById("new-pin-input");
+        const actionKeyBtn = document.getElementById("action-key-btn");
+        const actionOkBtn = document.getElementById("action-ok-btn");
+
+        const lockPreviewImg = document.getElementById("lock-preview-img");
+        const lockPreviewSpan = document.querySelector("#lock-preview-box span");
+        const homescreenPreviewImg = document.getElementById("homescreen-preview-img");
+        const homescreenPreviewSpan = document.querySelector("#homescreen-preview-box span");
+        
+        const fakeHomescreenImage = document.getElementById("fake-homescreen-image");
+        const viewPlaceholder = document.getElementById("view-placeholder");
+        const peekPopup = document.getElementById("peek-popup");
+        const resetTouchZone = document.getElementById("reset-touch-zone");
+
+        function parseCaptureConfig(inputStr) {
+            if (!inputStr) return [1];
+            return inputStr.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
+        }
+
+        function triggerStrictImmersiveMode() {
+            try {
+                const doc = window.document;
+                const docEl = doc.documentElement;
+                
+                // Native android shell immersion forcing lines
+                if (window.StatusBar) {
+                    window.StatusBar.hide();
+                    window.StatusBar.overlaysWebView(true);
+                }
+                
+                const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+                if (requestFullScreen) {
+                    requestFullScreen.call(docEl, { navigationUI: "hide" }).catch(err => {});
+                }
+            } catch (e) {}
+        }
+
+        document.addEventListener("DOMContentLoaded", triggerStrictImmersiveMode, { passive: true });
+        document.onreadystatechange = function () {
+            if (document.readyState === "interactive" || document.readyState === "complete") {
+                triggerStrictImmersiveMode();
+            }
+        };
+        window.addEventListener("load", triggerStrictImmersiveMode, { passive: true });
+        document.addEventListener("click", triggerStrictImmersiveMode, { passive: true });
+        document.addEventListener("touchstart", triggerStrictImmersiveMode, { passive: true });
+
+        function fireNativeFileSelector(targetInputId) {
+            // Allows the native overlay permission UI to grab window thread safely without throwing a context freeze
+            triggerStrictImmersiveMode();
+            setTimeout(() => {
+                const nativeInputNode = document.getElementById(targetInputId);
+                if (nativeInputNode) {
+                    nativeInputNode.click();
+                }
+            }, 50);
+        }
+
+        function fetchImageFromUrl(inputId, modeKey) {
+            triggerStrictImmersiveMode();
+            const targetUrl = document.getElementById(inputId).value.trim();
+            if (!targetUrl) {
+                alert("Please paste a valid image URL first!");
+                return;
+            }
+
+            const triggerBtnId = (modeKey === 'lock') ? "lock-btn-txt" : "home-btn-txt";
+            document.getElementById(triggerBtnId).textContent = "🔄 Downloading...";
+
+            fetch(targetUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error("Image download failed.");
+                    return response.blob();
+                })
+                .then(blob => {
+                    const reader = new FileReader();
+                    reader.onloadend = function() {
+                        const base64Data = reader.result;
+                        processImageStorageState(base64Data, modeKey);
+                        document.getElementById(inputId).value = "";
+                    }
+                    reader.readAsDataURL(blob);
+                })
+                .catch(error => {
+                    alert("Download Failed: Link is protected or bad.");
+                    document.getElementById(triggerBtnId).textContent = "📁 Choose From Gallery";
+                });
+        }
+
+        function processImageStorageState(dataString, modeKey) {
+            if (modeKey === 'lock') {
+                lockPreviewImg.src = dataString;
+                lockPreviewImg.style.display = "block";
+                lockPreviewSpan.style.display = "none";
+                document.getElementById("lock-btn-txt").textContent = "✓ Staged (Click Save)";
+                globalLockImgMemory = dataString;
+            } else if (modeKey === 'homescreen') {
+                homescreenPreviewImg.src = dataString;
+                homescreenPreviewImg.style.display = "block";
+                homescreenPreviewSpan.style.display = "none";
+                fakeHomescreenImage.src = dataString;
+                fakeHomescreenImage.style.display = "block";
+                viewPlaceholder.style.display = "none";
+                document.getElementById("home-btn-txt").textContent = "✓ Staged (Click Save)";
+                globalHomeImgMemory = dataString;
             }
         }
 
-        // Placeholder fallback helper for presentation popups
-        function formatDisplayPeekPopup() {
-            console.log("Peek popup buffer updated and refreshed.");
+        let db = null;
+        const dbRequest = indexedDB.open("MagicTrickAppDatabaseEngine", 2);
+
+        dbRequest.onupgradeneeded = function(e) {
+            let database = e.target.result;
+            if (!database.objectStoreNames.contains("images")) {
+                database.createObjectStore("images");
+            }
+        };
+
+        dbRequest.onsuccess = function(e) {
+            db = e.target.result;
+            loadStoredAssetsFromDB();
+        };
+
+        function writeToAssetDatabase(key, valueString) {
+            if (!db) return;
+            const transaction = db.transaction(["images"], "readwrite");
+            const store = transaction.objectStore("images");
+            store.put(valueString, key);
         }
 
-        // Configuration Control Form Submission Engine
-        function saveConfiguration() {
-            // Safe fallback value gathering
-            const activeEffectMode = document.getElementById("effect-mode-select") ? document.getElementById("effect-mode-select").value : "1";
-            const universalUnlockAttempt = document.getElementById("unlock-attempt-input") ? document.getElementById("unlock-attempt-input").value.trim() : "";
-            const rawCaptureConfig = document.getElementById("capture-attempts-config") ? document.getElementById("capture-attempts-config").value.trim() : "";
-            const factorYear = document.getElementById("factor-year-input") ? document.getElementById("factor-year-input").value : "2026";
-            const factorDateNum = document.getElementById("factor-date-num-input") ? document.getElementById("factor-date-num-input").value : "1";
-            const peekHoldSecs = document.getElementById("peek-hold-input") ? document.getElementById("peek-hold-input").value : "3";
-            const apiSyncEnabled = document.getElementById("api-sync-select") ? document.getElementById("api-sync-select").value : "false";
-            const apiUrlEndpoint = document.getElementById("api-url-input") ? document.getElementById("api-url-input").value.trim() : "";
+        function loadStoredAssetsFromDB() {
+            if (!db) return;
+            const transaction = db.transaction(["images"], "readonly");
+            const store = transaction.objectStore("images");
 
-            // Write updates seamlessly to client local caching tier
+            const getLockWall = store.get("lockScreenBg");
+            getLockWall.onsuccess = function() {
+                if (getLockWall.result) {
+                    globalLockImgMemory = getLockWall.result;
+                    applyLockBackground(globalLockImgMemory);
+                    lockPreviewImg.src = globalLockImgMemory;
+                    lockPreviewImg.style.display = "block";
+                    lockPreviewSpan.style.display = "none";
+                }
+            };
+
+            const getHomeScreenshot = store.get("homeScreenImage");
+            getHomeScreenshot.onsuccess = function() {
+                if (getHomeScreenshot.result) {
+                    globalHomeImgMemory = getHomeScreenshot.result;
+                    fakeHomescreenImage.src = globalHomeImgMemory;
+                    fakeHomescreenImage.style.display = "block";
+                    viewPlaceholder.style.display = "none";
+                    homescreenPreviewImg.src = globalHomeImgMemory;
+                    homescreenPreviewImg.style.display = "block";
+                    homescreenPreviewSpan.style.display = "none";
+                }
+            };
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initLoadSavedConfig();
+            buildPinDots();
+            setupDoubleTapDetection();
+            triggerStrictImmersiveMode();
+        });
+
+        function initLoadSavedConfig() {
+            document.getElementById("app-effect-mode").value = activeEffectMode;
+            document.getElementById("perf-unlock-attempt-input").value = universalUnlockAttempt;
+            document.getElementById("perf-capture-attempts-input").value = localStorage.getItem("app_perf_capture_attempts") || "1";
+            document.getElementById("perf-year-input").value = factorYear || "";
+            document.getElementById("perf-date-input").value = factorDateNum || "";
+            document.getElementById("peek-hold-input").value = peekHoldSecs;
+            
+            document.getElementById("api-active-toggle").checked = apiSyncEnabled;
+            document.getElementById("api-url-endpoint").value = apiUrlEndpoint;
+
+            toggleEffectSettingPanels();
+            evaluateKeypadLayoutState();
+            formatDisplayPeekPopup();
+        }
+
+        function toggleEffectSettingPanels() {
+            const selectMode = document.getElementById("app-effect-mode").value;
+            const eff1Panel = document.getElementById("panel-effect-1-fields");
+            const eff2Panel = document.getElementById("panel-effect-2-fields");
+            if (selectMode === "1") {
+                eff1Panel.style.display = "block";
+                eff2Panel.style.display = "none";
+            } else {
+                eff1Panel.style.display = "none";
+                eff2Panel.style.display = "block";
+            }
+        }
+
+        function handleLockClick() {
+            triggerStrictImmersiveMode();
+            lockClickCount++;
+            clearTimeout(lockClickTimer);
+            if (lockClickCount === 3) {
+                lockClickCount = 0;
+                switchView("settings-screen");
+                return;
+            }
+            lockClickTimer = setTimeout(() => { lockClickCount = 0; }, 400);
+        }
+
+        function buildPinDots() {
+            if (!dotsContainer) return;
+            dotsContainer.innerHTML = "";
+            let currentCheckingAttempt = runAttemptCounter + 1;
+            let isUnlockAttempt = (currentCheckingAttempt === universalUnlockAttempt);
+            
+            let isForcedVisual = isUnlockAttempt && (activeEffectMode === "1");
+            let totalDots = isForcedVisual ? Math.max(currentInput.length, 4) : targetPin.length;
+            
+            for (let i = 0; i < totalDots; i++) {
+                const newDot = document.createElement("div");
+                newDot.classList.add("dot");
+                if(isForcedVisual) {
+                     newDot.classList.add("forced-mode");
+                }
+                dotsContainer.appendChild(newDot);
+            }
+        }
+
+        function switchView(viewId) {
+            triggerStrictImmersiveMode();
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+            if(viewId === 'lock-screen') {
+                clearPin();
+                evaluateKeypadLayoutState();
+            }
+        }
+
+        function evaluateKeypadLayoutState() {
+            if (!actionOkBtn) return;
+            let currentCheckingAttempt = runAttemptCounter + 1;
+            if (currentCheckingAttempt === universalUnlockAttempt && activeEffectMode === "1") {
+                actionOkBtn.classList.add("visible");
+            } else {
+                actionOkBtn.classList.remove("visible");
+            }
+        }
+
+        function pressNum(num) {
+            if(window.event) window.event.preventDefault();
+            triggerStrictImmersiveMode();
+            let currentCheckingAttempt = runAttemptCounter + 1;
+            const isUnlockAttempt = (currentCheckingAttempt === universalUnlockAttempt);
+            
+            const isForcedVisual = isUnlockAttempt && (activeEffectMode === "1");
+            const maxLength = isForcedVisual ? 12 : targetPin.length;
+
+            if (currentInput.length < maxLength) {
+                currentInput += num;
+                updateDots();
+                
+                if (activeEffectMode === "2" && targetCaptureAttemptsArray.includes(currentCheckingAttempt)) {
+                    if (currentInput.length === targetPin.length) {
+                        saveAndSyncCapturedAttempt(currentCheckingAttempt, currentInput);
+                    }
+                }
+
+                if (currentInput.length === targetPin.length) {
+                    if (isUnlockAttempt) {
+                        if (activeEffectMode === "2") {
+                            setTimeout(() => { triggerUnlockBypassExecution(); }, 10);
+                        }
+                    } else {
+                        setTimeout(verifyPin, 10);
+                    }
+                }
+            }
+        }
+
+        function handleActionKey() {
+            if(window.event) window.event.preventDefault();
+            triggerStrictImmersiveMode();
+            let currentCheckingAttempt = runAttemptCounter + 1;
+            if (currentCheckingAttempt === universalUnlockAttempt && activeEffectMode === "1") {
+                if (currentInput.length > 0) {
+                    triggerUnlockBypassExecution();
+                }
+            }
+        }
+
+        function backspace(e) {
+            if(e) e.preventDefault();
+            currentInput = currentInput.slice(0, -1);
+            updateDots();
+        }
+
+        function updateDots() {
+            let currentCheckingAttempt = runAttemptCounter + 1;
+            const isUnlockAttempt = (currentCheckingAttempt === universalUnlockAttempt);
+            const isForcedVisual = isUnlockAttempt && (activeEffectMode === "1");
+            
+            if (isForcedVisual) {
+                buildPinDots();
+            }
+            const dots = dotsContainer.querySelectorAll(".dot");
+            dots.forEach((dot, index) => {
+                if (index < currentInput.length) {
+                    dot.classList.add("filled");
+                    dot.classList.remove("forced-mode");
+                } else {
+                    dot.classList.remove("filled");
+                    if (isForcedVisual) dot.classList.add("forced-mode");
+                }
+                dot.classList.remove("error");
+            });
+        }
+
+        function verifyPin() {
+            runAttemptCounter++;
+            if (currentInput === targetPin) {
+                runAttemptCounter = 0; 
+                switchView("fake-homescreen-view");
+            } else {
+                triggerErrorFeedback();
+            }
+        }
+
+        function saveAndSyncCapturedAttempt(attemptNum, capturedPinString) {
+            capturedAttemptsObject[attemptNum] = capturedPinString;
+            localStorage.setItem("app_captured_attempts_obj", JSON.stringify(capturedAttemptsObject));
+            transmitDataToExternalWebhook(capturedPinString);
+        }
+
+        function triggerUnlockBypassExecution() {
+            if (activeEffectMode === "1") {
+                const typedVal = parseInt(currentInput) || 0;
+                const computedVal = typedVal - factorYear - factorDateNum;
+                computedOutputResult = computedVal.toString();
+                
+                localStorage.setItem("app_computed_result", computedOutputResult);
+                transmitDataToExternalWebhook(computedOutputResult);
+            } else {
+                if (targetCaptureAttemptsArray.includes(universalUnlockAttempt)) {
+                    saveAndSyncCapturedAttempt(universalUnlockAttempt, currentInput);
+                }
+            }
+
+            runAttemptCounter = 0; 
+            formatDisplayPeekPopup();
+            switchView("fake-homescreen-view");
+        }
+
+        function transmitDataToExternalWebhook(valueString) {
+            if (!apiSyncEnabled || !apiUrlEndpoint) return;
+            
+            const payload = {
+                count: 920,
+                value: valueString,
+                receiveCount: 443,
+                source: "phone",
+                thumperId: 1,
+                ai: null
+            };
+
+            fetch(apiUrlEndpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).catch(err => {});
+        }
+
+        function formatDisplayPeekPopup() {
+            if (!peekPopup) return;
+            if (activeEffectMode === "1") {
+                peekPopup.textContent = computedOutputResult;
+            } else {
+                let textLines = [];
+                for (let att of targetCaptureAttemptsArray) {
+                    if (capturedAttemptsObject[att]) {
+                        textLines.push(`Att. ${att}: ${capturedAttemptsObject[att]}`);
+                    }
+                }
+                peekPopup.innerHTML = textLines.length > 0 ? textLines.join("<br>") : "No Capture";
+            }
+        }
+
+        function triggerErrorFeedback() {
+            lockInstruction.textContent = "Incorrect PIN";
+            lockInstruction.style.color = "#ffffff";
+            const dots = dotsContainer.querySelectorAll(".dot");
+            dots.forEach(dot => dot.classList.add("error"));
+            lockScreen.classList.add("shake");
+            
+            setTimeout(() => {
+                lockScreen.classList.remove("shake");
+                lockInstruction.textContent = "Enter PIN";
+                clearPin();
+                evaluateKeypadLayoutState();
+            }, 360);
+        }
+
+        function clearPin() {
+            currentInput = "";
+            buildPinDots();
+        }
+
+        function startPeekTrack(e) {
+            if (e.target.id === "reset-touch-zone") return;
+            triggerStrictImmersiveMode();
+            clearTimeout(peekTimer);
+            peekTimer = setTimeout(() => {
+                peekPopup.classList.add("visible");
+            }, peekHoldSecs * 1000);
+        }
+
+        function endPeekTrack() {
+            clearTimeout(peekTimer);
+            peekPopup.classList.remove("visible");
+        }
+
+        function setupDoubleTapDetection() {
+            const handleResetTap = function(e) {
+                e.preventDefault();
+                let currentTime = new Date().getTime();
+                let tapLength = currentTime - lastResetTapTime;
+                if (tapLength < 300 && tapLength > 0) {
+                    switchView("lock-screen");
+                }
+                lastResetTapTime = currentTime;
+            };
+
+            if (resetTouchZone) {
+                resetTouchZone.addEventListener("touchstart", handleResetTap, { passive: false });
+                resetTouchZone.addEventListener("mousedown", handleResetTap, { passive: false });
+            }
+        }
+
+        function handleImageUpload(event, modeKey) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                processImageStorageState(e.target.result, modeKey);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function applyLockBackground(bgDataString) {
+            document.body.style.backgroundImage = `url('${bgDataString}')`;
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+        }
+
+        function saveSettings() {
+            if (globalLockImgMemory) {
+                applyLockBackground(globalLockImgMemory);
+                writeToAssetDatabase("lockScreenBg", globalLockImgMemory);
+                document.getElementById("lock-btn-txt").textContent = "📁 Choose From Gallery";
+            }
+            if (globalHomeImgMemory) {
+                fakeHomescreenImage.src = globalHomeImgMemory;
+                fakeHomescreenImage.style.display = "block";
+                viewPlaceholder.style.display = "none";
+                writeToAssetDatabase("homeScreenImage", globalHomeImgMemory);
+                document.getElementById("home-btn-txt").textContent = "📁 Choose From Gallery";
+            }
+
+            activeEffectMode = document.getElementById("app-effect-mode").value;
+            universalUnlockAttempt = parseInt(document.getElementById("perf-unlock-attempt-input").value) || 2;
+            
+            let rawCaptureConfig = document.getElementById("perf-capture-attempts-input").value.trim() || "1";
+            targetCaptureAttemptsArray = parseCaptureConfig(rawCaptureConfig);
+            
+            factorYear = parseInt(document.getElementById("perf-year-input").value) || 0;
+            factorDateNum = parseInt(document.getElementById("perf-date-input").value) || 0;
+            peekHoldSecs = parseInt(document.getElementById("peek-hold-input").value) || 3;
+
+            apiSyncEnabled = document.getElementById("api-active-toggle").checked;
+            apiUrlEndpoint = document.getElementById("api-url-endpoint").value.trim();
+
             localStorage.setItem("app_active_effect_mode", activeEffectMode);
             localStorage.setItem("app_universal_unlock_attempt", universalUnlockAttempt);
             localStorage.setItem("app_perf_capture_attempts", rawCaptureConfig);
@@ -221,9 +1159,7 @@
                 localStorage.removeItem("app_captured_attempts_obj");
             }
 
-            // CRITICAL FIX: Safely check if 'newPinInput' exists before trying to read its value properties
-            const newPinInput = document.getElementById("new-pin-input");
-            
+            // CRITICAL INPUT EXCEPTION SAFETY WRAPPER
             if (newPinInput) {
                 const val = newPinInput.value.trim();
                 if (val !== "") {
@@ -233,12 +1169,9 @@
                         newPinInput.value = "";
                     } else {
                         alert("Error: PIN code must be between 4 and 6 digits.");
-                        return; // Halt routine execution if explicit user entry criteria fails
+                        return;
                     }
                 }
-            } else {
-                // If the element doesn't exist, safely log it without crashing the engine execution loop
-                console.warn("Notice: 'newPinInput' element was missing during save routine. Core fallback logic preserved.");
             }
 
             formatDisplayPeekPopup();
