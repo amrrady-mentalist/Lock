@@ -102,12 +102,12 @@ jobs:
                 <splash src="res/screen/android/screen.png" />
                 <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/icon/android/icon.png" />
                 <preference name="AndroidWindowSplashScreenBackground" value="#000000" />
+                
+                <config-file target="AndroidManifest.xml" parent="/*">
+                    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+                    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+                </config-file>
             </platform>
-            
-            <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">
-                <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-                <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-            </config-file>
         </widget>
         EOF
 
