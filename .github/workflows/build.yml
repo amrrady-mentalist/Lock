@@ -1,0 +1,82 @@
+name: Build Offline Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  dist-apk:
+    name: Compile Standalone Offline Android Project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository Source
+        uses: actions/checkout@v4
+
+      - name: Initialize Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java Development Kit (JDK 17)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Install Cordova Framework
+        run: npm install -g cordova
+
+      - name: Generate Local Android Project
+        run: |
+          cordova create magic-app com.mentalist.lock "Lock"
+          cd magic-app
+          cordova platform add android --no-telemetry
+
+      - name: Process Custom Application Icon
+        run: |
+          # Safely process the flat icon vector into a master app image
+          convert -background none -size 512x512 icon.svg magic-app/icon.png
+
+      - name: Generate Perfect Clean System Configuration
+        run: |
+          cat << 'EOF' > magic-app/config.xml
+          <?xml version='1.0' encoding='utf-8'?>
+          <widget id="com.mentalist.lock" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+              <name>Lock</name>
+              <description>Offline Standalone Application</description>
+              <author email="dev@cordova.apache.org" href="http://cordova.io">Amr Rady</author>
+              <content src="index.html" />
+              <access origin="*" />
+              <allow-intent href="http://*/*" />
+              <allow-intent href="https://*/*" />
+              
+              <icon src="icon.png" />
+              
+              <platform name="android">
+                  <config-file target="AndroidManifest.xml" parent="/*">
+                      <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+                      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+                      <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+                  </config-file>
+              </platform>
+          </widget>
+          EOF
+
+      - name: Inject Offline Application Assets
+        run: |
+          rm -rf magic-app/www/*
+          cp index.html magic-app/www/index.html
+
+      - name: Compile Production APK Package
+        run: |
+          cd magic-app
+          cordova build android --debug --device
+
+      - name: Deploy Standalone APK Artifact to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: Offline-Lock-App
+          path: magic-app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
