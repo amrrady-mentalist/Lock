@@ -28,25 +28,15 @@ jobs:
     - name: Install Cordova Framework
       run: npm install -g cordova
 
-    - name: Generate Local Android Project & Inject Essential Native Plugins
+    - name: Generate Local Android Project & Components
       run: |
         cordova create outputapp com.mentalist.lockapp "Lock"
         cd outputapp
         cordova platform add android
         cordova plugin add cordova-plugin-camera
         cordova plugin add cordova-plugin-statusbar
-        cp -R ../index.html www/index.html
-        
-    - name: Configure Storage Permissions & Immersive StatusBar Preferences
-      run: |
-        cd outputapp
-        # Inject explicit Android preferences inside the platform tags safely
-        sed -i '/<platform name="android">/a \        <preference name="StatusBarOverlaysWebView" value="true" />\n        <preference name="StatusBarBackgroundColor" value="#00000000" />\n        <preference name="StatusBarStyle" value="lightcontent" />\n        <preference name="Fullscreen" value="true" />' config.xml
-        
-        # Add explicit Android manifest configurations for permission targeting
-        sed -i '/<\/widget>/i \    <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">\n        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" \/>\n        <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" \/>\n    <\/config-file>' config.xml
 
-    - name: Generate High-Visibility App Icon & Splash Screen Asset
+    - name: Generate App Icon & Splash Assets
       run: |
         cd outputapp
         mkdir -p res/icon/android
@@ -87,7 +77,43 @@ jobs:
         with open('res/screen/android/screen.png', 'wb') as f:
             f.write(img_bytes)
         "
-        sed -i '/<platform name="android">/a \        <icon src="res/icon/android/icon.png" />\n        <splash src="res/screen/android/screen.png" />' config.xml
+
+    - name: Generate Pristine Structural Config File
+      run: |
+        cat << 'EOF' > outputapp/config.xml
+        <?xml version='1.0' encoding='utf-8'?>
+        <widget id="com.mentalist.lockapp" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+            <name>Lock</name>
+            <description>Magic Interface Platform</description>
+            <author email="dev@lockapp.local" href="http://lockapp.local">Magic App Developer</author>
+            <content src="index.html" />
+            <access origin="*" />
+            <allow-intent href="http://*/*" />
+            <allow-intent href="https://*/*" />
+            
+            <preference name="Fullscreen" value="true" />
+            <preference name="StatusBarOverlaysWebView" value="true" />
+            <preference name="StatusBarBackgroundColor" value="#00000000" />
+            <preference name="StatusBarStyle" value="lightcontent" />
+
+            <platform name="android">
+                <allow-intent href="market:*" />
+                <icon src="res/icon/android/icon.png" />
+                <splash src="res/screen/android/screen.png" />
+                <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/icon/android/icon.png" />
+                <preference name="AndroidWindowSplashScreenBackground" value="#000000" />
+            </platform>
+            
+            <config-file target="AndroidManifest.xml" parent="/*" xmlns:android="http://schemas.android.com/apk/res/android">
+                <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+                <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+            </config-file>
+        </widget>
+        EOF
+
+    - name: Deploy Compiled Application Code
+      run: |
+        cp -R index.html outputapp/www/index.html
 
     - name: Compile Android Debug APK
       run: |
