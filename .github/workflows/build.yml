@@ -35,28 +35,66 @@ jobs:
         cordova platform add android
         cp -R ../index.html www/index.html
         
-    - name: Generate Flat Black Lock Icon (Pure Code)
+    - name: Configure Storage Permissions & Android Capabilities
+      run: |
+        cd outputapp
+        # Inject explicit Android Read Storage permissions into the Cordova configuration system
+        sed -i '/<\/widget>/i \    <config-file target="AndroidManifest.xml" parent="/*">\n        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" \/>\n        <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" \/>\n    <\/config-file>' config.xml
+
+    - name: Generate High-Visibility App Icon (Custom Magic Design)
       run: |
         cd outputapp
         mkdir -p res/icon/android
+        # Generates a professional 512x512 gradient background with a sleek white keyhole design asset
         python3 -c "
-        import struct, zlib
-        def make_png(w, h, color):
-            buf = b''.join([b'\x00' + color * w for _ in range(h)])
+        import struct, zlib, math
+        def make_png():
+            w, h = 512, 512
+            img_data = bytearray()
+            for y in range(h):
+                img_data.append(0) # Filter type byte
+                for x in range(w):
+                    # Create radial coordinates for smooth background gradient background
+                    dx, dy = x - 256, y - 256
+                    dist = math.sqrt(dx*dx + dy*dy)
+                    
+                    # Base elegant deep violet to dark crimson shift profile
+                    r = max(10, int(25 - (dist * 0.02)))
+                    g = max(12, int(15 - (dist * 0.01)))
+                    b = max(35, int(55 - (dist * 0.05)))
+                    
+                    # Vector rendering math for an abstract magic lock keyhole emblem in the center
+                    in_keyhole = False
+                    # Upper circular head of keyhole
+                    if math.sqrt(dx*dx + (dy + 30)*(dy + 30)) < 45:
+                        in_keyhole = True
+                    # Lower flared trapezoid body of keyhole
+                    elif dy >= -10 and dy <= 80:
+                        w_at_y = 20 + (dy - (-10)) * 0.45
+                        if abs(dx) < w_at_y:
+                            in_keyhole = True
+                            
+                    if in_keyhole:
+                        # Soft glowing white color for the central keyhole element
+                        r, g, b = 245, 245, 250
+                        
+                    img_data.extend([r, g, b])
+            
             chunks = [
                 b'\x89PNG\r\n\x1a\n',
                 b'IHDR' + struct.pack('>IIBBBBB', w, h, 8, 2, 0, 0, 0),
-                b'IDAT' + zlib.compress(buf),
+                b'IDAT' + zlib.compress(img_data),
                 b'IEND'
             ]
             return b''.join([c if i==0 else struct.pack('>I', len(c)-4) + c + struct.pack('>I', zlib.crc32(c)) for i, c in enumerate(chunks)])
+            
         with open('res/icon/android/icon.png', 'wb') as f:
-            f.write(make_png(512, 512, b'\x00\x00\x00'))
+            f.write(make_png())
         "
+        # Inject icon declaration properties cleanly into preference trees
         sed -i '/<\/widget>/i \    <platform name="android">\n        <icon src="res/icon/android/icon.png" \/>\n    <\/platform>' config.xml
 
     - name: Compile Android Debug APK
-      # Changed to standard build so it packages with a clean, automatic signature that Android accepts instantly
       run: |
         cd outputapp
         cordova build android
