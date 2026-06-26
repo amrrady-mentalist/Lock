@@ -673,8 +673,7 @@
 
             navigator.camera.getPicture(
                 function(base64Data) {
-                    const completeBase64Str = "data:image/jpeg;base64," + base64Data;
-                    processImageStorageState(completeBase64Str, modeKey);
+                    processImageStorageState(base64Data, modeKey);
                 },
                 function(failError) {
                     console.log("Gallery selection skipped: " + failError);
@@ -771,35 +770,43 @@
                 });
         }
 
-        function processImageStorageState(dataString, modeKey) {
+        function processImageStorageState(rawString, modeKey) {
+            if (!rawString) return;
+            
+            // SECURITY CORDOVA SANITIZATION PATCH:
+            // Checks if string already includes explicit headers or if it's raw data
+            let finalDataUrl = rawString;
+            if (!rawString.startsWith("data:image")) {
+                // Strips unexpected line breaks or layout spacing parameters sent by WebView camera callbacks
+                let cleanedBase64 = rawString.replace(/[\r\n\s]/g, "");
+                finalDataUrl = "data:image/jpeg;base64," + cleanedBase64;
+            }
+
             if (modeKey === 'lock') {
-                lockPreviewImg.src = dataString;
+                lockPreviewImg.src = finalDataUrl;
                 lockPreviewImg.style.display = "block";
                 lockPreviewSpan.style.display = "none";
-                globalLockImgMemory = dataString;
-                applyLockBackground(dataString);
+                globalLockImgMemory = finalDataUrl;
+                applyLockBackground(finalDataUrl);
                 
-                // Active Fallback Cache Pipeline
-                localStorage.setItem("cache_local_lock_bg", dataString);
-                writeToAssetDatabase("lockScreenBg", dataString);
+                localStorage.setItem("cache_local_lock_bg", finalDataUrl);
+                writeToAssetDatabase("lockScreenBg", finalDataUrl);
             } else if (modeKey === 'homescreen') {
-                homescreenPreviewImg.src = dataString;
+                homescreenPreviewImg.src = finalDataUrl;
                 homescreenPreviewImg.style.display = "block";
                 homescreenPreviewSpan.style.display = "none";
-                fakeHomescreenImage.src = dataString;
+                fakeHomescreenImage.src = finalDataUrl;
                 fakeHomescreenImage.style.display = "block";
                 viewPlaceholder.style.display = "none";
-                globalHomeImgMemory = dataString;
+                globalHomeImgMemory = finalDataUrl;
                 
-                // Active Fallback Cache Pipeline
-                localStorage.setItem("cache_local_home_bg", dataString);
-                writeToAssetDatabase("homeScreenImage", dataString);
+                localStorage.setItem("cache_local_home_bg", finalDataUrl);
+                writeToAssetDatabase("homeScreenImage", finalDataUrl);
             }
         }
 
         let db = null;
         
-        // Wrapped Database Trigger logic so it safely fires after DOM elements map completely
         function initIndexedDBStore() {
             try {
                 const dbRequest = indexedDB.open("MagicTrickAppDatabaseEngine", 2);
@@ -906,16 +913,11 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Step 1: Always check fallback storage instantly so images map immediately
             loadFallbackCacheAssets();
-            
-            // Step 2: Fire standard parameters mapping
             initLoadSavedConfig();
             buildPinDots();
             setupDoubleTapDetection();
             initializeHighSpeedKeypadListeners();
-            
-            // Step 3: Spin up IndexedDB asynchronously without blocking UI elements mapping
             initIndexedDBStore();
         });
 
@@ -1140,7 +1142,6 @@
                 lockScreen.classList.remove("shake");
                 lockInstruction.textContent = "Enter PIN";
                 clearPin();
-                disabledKeypadInputState = false;
                 evaluateKeypadLayoutState();
             }, 360);
         }
