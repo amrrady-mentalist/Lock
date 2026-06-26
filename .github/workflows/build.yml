@@ -29,7 +29,6 @@ jobs:
       run: npm install -g cordova
 
     - name: Generate Local Android Project
-      # CHANGED: 'com.mentalist.lock' to 'com.mentalist.lockapp' to avoid reserved keyword crash
       run: |
         cordova create outputapp com.mentalist.lockapp "Lock"
         cd outputapp
@@ -40,7 +39,6 @@ jobs:
       run: |
         cd outputapp
         mkdir -p res/icon/android
-        # Generates a solid pitch-black 512x512 png icon directly using native python tools
         python3 -c "
         import struct, zlib
         def make_png(w, h, color):
@@ -55,25 +53,16 @@ jobs:
         with open('res/icon/android/icon.png', 'wb') as f:
             f.write(make_png(512, 512, b'\x00\x00\x00'))
         "
-        # Inject custom icon preference directly into Cordova config file
         sed -i '/<\/widget>/i \    <platform name="android">\n        <icon src="res/icon/android/icon.png" \/>\n    <\/platform>' config.xml
 
-    - name: Compile Android Release APK
+    - name: Compile Android Debug APK
+      # Changed to standard build so it packages with a clean, automatic signature that Android accepts instantly
       run: |
         cd outputapp
-        cordova build android --release -- --packageType=apk
-
-    - name: Sign Android Binary Asset
-      run: |
-        cd outputapp/platforms/android/app/build/outputs/apk/release
-        # Generate a temporary keystore to sign the application securely
-        keytool -genkey -v -keystore release.keystore -alias app-alias -keyalg RSA -keysize 2048 -validity 10000 -storepass targetpassword -keypass targetpassword -dname "CN=Android,O=Magic,C=US"
-        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore release.keystore -storepass targetpassword app-release-unsigned.apk app-alias
-        # Standardize the alignment array parameters
-        ${ANDROID_HOME}/build-tools/34.0.0/zipalign -v 4 app-release-unsigned.apk MagicLock.apk
+        cordova build android
 
     - name: Upload Finished APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: Magic-Lock-Application
-        path: outputapp/platforms/android/app/build/outputs/apk/release/MagicLock.apk
+        path: outputapp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
