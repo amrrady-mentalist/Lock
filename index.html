@@ -112,7 +112,6 @@
             justify-content: center;
             gap: 12px;
             min-height: 14px;
-            /* Exactly 2 millimeters down layout modification */
             transform: translateY(2mm);
         }
 
@@ -236,15 +235,32 @@
             40%, 60% { transform: translate3d(4px, 0, 0); }
         }
 
-        /* --- REVEAL VIEW --- */
+        /* --- REVEAL HOMESCREEN SLIDER SYSTEM --- */
         #fake-homescreen-view {
             background-color: #000000;
-            justify-content: center;
-            align-items: center;
             position: relative;
         }
 
-        #fake-homescreen-image {
+        .homescreen-slider-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform;
+        }
+
+        .homescreen-page {
+            min-width: 100%;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .homescreen-page img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -257,6 +273,33 @@
             text-align: center;
             padding: 25px;
             line-height: 1.4;
+            position: absolute;
+        }
+
+        /* Desktop/Mobile slider indicator array dots */
+        .homescreen-nav-dots {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            z-index: 120;
+            pointer-events: none;
+        }
+
+        .h-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transition: all 0.2s;
+        }
+
+        .h-dot.active {
+            background: #ffffff;
+            transform: scale(1.2);
         }
 
         .bottom-reset-trigger-pad {
@@ -288,7 +331,7 @@
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.12s ease;
-            z-index: 100;
+            z-index: 130;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             letter-spacing: 1px;
             line-height: 1.4;
@@ -506,10 +549,29 @@
         </div>
     </div>
 
-    <!-- Container matching image reference verbatim file 231059.jpg layout -->
-    <div id="fake-homescreen-view" class="view hidden" onmousedown="startPeekTrack(event)" onmouseup="endPeekTrack(event)" onmouseleave="endPeekTrack(event)" ontouchstart="startPeekTrack(event)" ontouchend="endPeekTrack(event)" ontouchcancel="endPeekTrack(event)">
-        <img id="fake-homescreen-image" alt="Fake Home Screen ScreenShot">
-        <div id="view-placeholder" class="placeholder-text">No home screen screenshot uploaded yet. Triple click lock icon to configure.</div>
+    <!-- Multi-page Interactive Fake Homescreen View -->
+    <div id="fake-homescreen-view" class="view hidden" 
+         onmousedown="startPeekTrack(event)" onmouseup="endPeekTrack(event)" onmouseleave="endPeekTrack(event)" 
+         ontouchstart="startPeekTrack(event)" ontouchend="endPeekTrack(event)" ontouchcancel="endPeekTrack(event)">
+        
+        <div class="homescreen-slider-container" id="homescreen-slider">
+            <!-- Page 1 Container -->
+            <div class="homescreen-page" id="h-page-1">
+                <img id="fake-homescreen-image" alt="Fake Home Screen Page 1">
+                <div id="view-placeholder" class="placeholder-text">No page 1 home screen screenshot loaded. Triple click lock icon to configure.</div>
+            </div>
+            <!-- Page 2 Container -->
+            <div class="homescreen-page" id="h-page-2">
+                <img id="fake-homescreen-image-2" alt="Fake Home Screen Page 2">
+                <div id="view-placeholder-2" class="placeholder-text">No page 2 home screen screenshot loaded. Upload one in config.</div>
+            </div>
+        </div>
+
+        <!-- Pagination UI Dots -->
+        <div class="homescreen-nav-dots">
+            <div class="h-dot active" id="h-dot-1"></div>
+            <div class="h-dot" id="h-dot-2"></div>
+        </div>
         
         <div class="bottom-reset-trigger-pad" id="reset-touch-zone"></div>
         
@@ -526,12 +588,10 @@
             <div class="native-system-gallery-row" onclick="openNativeSystemGalleryPicker('lock')">
                 <span class="gallery-helper-prompt">🖼️ Choose from Gallery</span>
             </div>
-            
             <div class="url-input-container">
                 <input type="url" id="lock-url-input" placeholder="Or paste direct image URL (.jpg/.png)">
                 <button type="button" class="btn-inline-fetch" onclick="fetchImageFromUrl('lock-url-input', 'lock')">Fetch</button>
             </div>
-
             <div class="preview-container" id="lock-preview-box">
                 <span>Using default glass gradient</span>
                 <img id="lock-preview-img" alt="Lock screen wallpaper preview">
@@ -539,19 +599,33 @@
         </div>
 
         <div class="settings-group">
-            <label>2. Home Screen Screenshot Image</label>
+            <label>2. Home Screen Screenshot (Page 1)</label>
             <div class="native-system-gallery-row" onclick="openNativeSystemGalleryPicker('homescreen')">
-                <span class="gallery-helper-prompt">🖼️ Choose from Gallery</span>
+                <span class="gallery-helper-prompt">🖼️ Choose Page 1 Screenshot</span>
             </div>
-            
             <div class="url-input-container">
                 <input type="url" id="home-url-input" placeholder="Or paste direct image URL (.jpg/.png)">
                 <button type="button" class="btn-inline-fetch" onclick="fetchImageFromUrl('home-url-input', 'homescreen')">Fetch</button>
             </div>
-
             <div class="preview-container" id="homescreen-preview-box">
                 <span>No screenshot loaded</span>
                 <img id="homescreen-preview-img" alt="Fake homescreen reveal preview">
+            </div>
+        </div>
+
+        <!-- Page 2 Upload Settings Interface -->
+        <div class="settings-group">
+            <label>3. Home Screen Screenshot (Page 2)</label>
+            <div class="native-system-gallery-row" onclick="openNativeSystemGalleryPicker('homescreen2')">
+                <span class="gallery-helper-prompt">🖼️ Choose Page 2 Screenshot</span>
+            </div>
+            <div class="url-input-container">
+                <input type="url" id="home2-url-input" placeholder="Or paste direct image URL (.jpg/.png)">
+                <button type="button" class="btn-inline-fetch" onclick="fetchImageFromUrl('home2-url-input', 'homescreen2')">Fetch</button>
+            </div>
+            <div class="preview-container" id="homescreen2-preview-box">
+                <span>No page 2 screenshot loaded</span>
+                <img id="homescreen2-preview-img" alt="Fake homescreen page 2 preview">
             </div>
         </div>
 
@@ -612,6 +686,7 @@
         
         let globalLockImgMemory = "";
         let globalHomeImgMemory = "";
+        let globalHome2ImgMemory = "";
 
         let runAttemptCounter = 0; 
         let activeEffectMode = localStorage.getItem("app_active_effect_mode") || "1";
@@ -630,11 +705,18 @@
 
         let peekHoldSecs = parseInt(localStorage.getItem("app_peek_hold_time")) || 3;
         let peekTimer = null;
+        let isUsingTouch = false;
 
         let lockClickCount = 0;
         let lockClickTimer = null;
         
         let lastResetTapTime = 0;
+
+        // Swiping State Tracking Variables
+        let currentActivePage = 0; 
+        let swipeStartX = 0;
+        let swipeStartY = 0;
+        let isViewSwiping = false;
 
         const lockScreen = document.getElementById("lock-screen");
         const dotsContainer = document.getElementById("dots-container");
@@ -648,9 +730,15 @@
         const lockPreviewSpan = document.querySelector("#lock-preview-box span");
         const homescreenPreviewImg = document.getElementById("homescreen-preview-img");
         const homescreenPreviewSpan = document.querySelector("#homescreen-preview-box span");
+        const homescreen2PreviewImg = document.getElementById("homescreen2-preview-img");
+        const homescreen2PreviewSpan = document.querySelector("#homescreen2-preview-box span");
         
         const fakeHomescreenImage = document.getElementById("fake-homescreen-image");
+        const fakeHomescreenImage2 = document.getElementById("fake-homescreen-image-2");
         const viewPlaceholder = document.getElementById("view-placeholder");
+        const viewPlaceholder2 = document.getElementById("view-placeholder-2");
+        
+        const homescreenSlider = document.getElementById("homescreen-slider");
         const peekPopup = document.getElementById("peek-popup");
         const resetTouchZone = document.getElementById("reset-touch-zone");
 
@@ -666,7 +754,7 @@
 
         function openNativeSystemGalleryPicker(modeKey) {
             if (!navigator.camera) {
-                alert("Platform engine running container initialization setup. Try again in a brief second!");
+                alert("Platform engine initialization pending. Try again in a second!");
                 return;
             }
 
@@ -699,11 +787,8 @@
                     e.preventDefault();
                     keyBtn.classList.add('glowing');
                     const value = keyBtn.getAttribute('data-val');
-                    if (value !== null) {
-                        pressNum(value);
-                    }
+                    if (value !== null) pressNum(value);
                 };
-
                 const releasePress = function(e) {
                     e.preventDefault();
                     keyBtn.classList.remove('glowing');
@@ -722,14 +807,10 @@
                     actionKeyBtn.classList.add('glowing-action');
                     backspace();
                 };
-                const releaseDel = function(e) {
-                    e.preventDefault();
-                    actionKeyBtn.classList.remove('glowing-action');
-                };
                 actionKeyBtn.addEventListener('touchstart', triggerDel, { passive: false });
-                actionKeyBtn.addEventListener('touchend', releaseDel, { passive: false });
+                actionKeyBtn.addEventListener('touchend', (e) => { e.preventDefault(); actionKeyBtn.classList.remove('glowing-action'); }, { passive: false });
                 actionKeyBtn.addEventListener('mousedown', triggerDel);
-                actionKeyBtn.addEventListener('mouseup', releaseDel);
+                actionKeyBtn.addEventListener('mouseup', () => actionKeyBtn.classList.remove('glowing-action'));
             }
 
             if (actionOkBtn) {
@@ -738,14 +819,10 @@
                     actionOkBtn.classList.add('glowing-action');
                     handleActionKey();
                 };
-                const releaseOk = function(e) {
-                    e.preventDefault();
-                    actionOkBtn.classList.remove('glowing-action');
-                };
                 actionOkBtn.addEventListener('touchstart', triggerOk, { passive: false });
-                actionOkBtn.addEventListener('touchend', releaseOk, { passive: false });
+                actionOkBtn.addEventListener('touchend', (e) => { e.preventDefault(); actionOkBtn.classList.remove('glowing-action'); }, { passive: false });
                 actionOkBtn.addEventListener('mousedown', triggerOk);
-                actionOkBtn.addEventListener('mouseup', releaseOk);
+                actionOkBtn.addEventListener('mouseup', () => actionOkBtn.classList.remove('glowing-action'));
             }
         }
 
@@ -769,15 +846,12 @@
                 .then(blob => {
                     const reader = new FileReader();
                     reader.onloadend = function() {
-                        const base64Data = reader.result;
-                        processImageStorageState(base64Data, modeKey);
+                        processImageStorageState(reader.result, modeKey);
                         document.getElementById(inputId).value = "";
                     }
                     reader.readAsDataURL(blob);
                 })
-                .catch(error => {
-                    alert("Download Failed: Link is protected or bad.");
-                });
+                .catch(error => alert("Download Failed: Link is protected or bad."));
         }
 
         function processImageStorageState(rawString, modeKey) {
@@ -795,7 +869,6 @@
                 lockPreviewSpan.style.display = "none";
                 globalLockImgMemory = finalDataUrl;
                 applyLockBackground(finalDataUrl);
-                
                 localStorage.setItem("cache_local_lock_bg", finalDataUrl);
                 writeToAssetDatabase("lockScreenBg", finalDataUrl);
             } else if (modeKey === 'homescreen') {
@@ -806,116 +879,113 @@
                 fakeHomescreenImage.style.display = "block";
                 viewPlaceholder.style.display = "none";
                 globalHomeImgMemory = finalDataUrl;
-                
                 localStorage.setItem("cache_local_home_bg", finalDataUrl);
                 writeToAssetDatabase("homeScreenImage", finalDataUrl);
+            } else if (modeKey === 'homescreen2') {
+                homescreen2PreviewImg.src = finalDataUrl;
+                homescreen2PreviewImg.style.display = "block";
+                homescreen2PreviewSpan.style.display = "none";
+                fakeHomescreenImage2.src = finalDataUrl;
+                fakeHomescreenImage2.style.display = "block";
+                viewPlaceholder2.style.display = "none";
+                globalHome2ImgMemory = finalDataUrl;
+                localStorage.setItem("cache_local_home2_bg", finalDataUrl);
+                writeToAssetDatabase("homeScreenImage2", finalDataUrl);
             }
         }
 
         let db = null;
-        
         function initIndexedDBStore() {
             try {
                 const dbRequest = indexedDB.open("MagicTrickAppDatabaseEngine", 2);
-
                 dbRequest.onupgradeneeded = function(e) {
                     let database = e.target.result;
                     if (!database.objectStoreNames.contains("images")) {
                         database.createObjectStore("images");
                     }
                 };
-
                 dbRequest.onsuccess = function(e) {
                     db = e.target.result;
                     loadStoredAssetsFromDB();
                 };
-                
-                dbRequest.onerror = function() {
-                    loadFallbackCacheAssets();
-                };
-            } catch (err) {
-                loadFallbackCacheAssets();
-            }
+                dbRequest.onerror = function() { loadFallbackCacheAssets(); };
+            } catch (err) { loadFallbackCacheAssets(); }
         }
 
         function writeToAssetDatabase(key, valueString) {
             if (!db) return;
             try {
                 const transaction = db.transaction(["images"], "readwrite");
-                const store = transaction.objectStore("images");
-                store.put(valueString, key);
+                transaction.objectStore("images").put(valueString, key);
             } catch(e) {}
         }
 
         function loadStoredAssetsFromDB() {
-            if (!db) {
-                loadFallbackCacheAssets();
-                return;
-            }
+            if (!db) { loadFallbackCacheAssets(); return; }
             try {
                 const transaction = db.transaction(["images"], "readonly");
                 const store = transaction.objectStore("images");
 
-                const getLockWall = store.get("lockScreenBg");
-                getLockWall.onsuccess = function() {
-                    if (getLockWall.result) {
-                        globalLockImgMemory = getLockWall.result;
+                store.get("lockScreenBg").onsuccess = function(e) {
+                    if (e.target.result) {
+                        globalLockImgMemory = e.target.result;
                         applyLockBackground(globalLockImgMemory);
                         lockPreviewImg.src = globalLockImgMemory;
                         lockPreviewImg.style.display = "block";
                         lockPreviewSpan.style.display = "none";
-                    } else {
-                        loadIndividualLockFallback();
-                    }
+                    } else { loadIndividualLockFallback(); }
                 };
-                getLockWall.onerror = loadIndividualLockFallback;
-
-                const getHomeScreenshot = store.get("homeScreenImage");
-                getHomeScreenshot.onsuccess = function() {
-                    if (getHomeScreenshot.result) {
-                        globalHomeImgMemory = getHomeScreenshot.result;
+                
+                store.get("homeScreenImage").onsuccess = function(e) {
+                    if (e.target.result) {
+                        globalHomeImgMemory = e.target.result;
                         fakeHomescreenImage.src = globalHomeImgMemory;
                         fakeHomescreenImage.style.display = "block";
                         viewPlaceholder.style.display = "none";
                         homescreenPreviewImg.src = globalHomeImgMemory;
                         homescreenPreviewImg.style.display = "block";
                         homescreenPreviewSpan.style.display = "none";
-                    } else {
-                        loadIndividualHomeFallback();
-                    }
+                    } else { loadIndividualHomeFallback(); }
                 };
-                getHomeScreenshot.onerror = loadIndividualHomeFallback;
-            } catch(e) {
-                loadFallbackCacheAssets();
-            }
+
+                store.get("homeScreenImage2").onsuccess = function(e) {
+                    if (e.target.result) {
+                        globalHome2ImgMemory = e.target.result;
+                        fakeHomescreenImage2.src = globalHome2ImgMemory;
+                        fakeHomescreenImage2.style.display = "block";
+                        viewPlaceholder2.style.display = "none";
+                        homescreen2PreviewImg.src = globalHome2ImgMemory;
+                        homescreen2PreviewImg.style.display = "block";
+                        homescreen2PreviewSpan.style.display = "none";
+                    } else { loadIndividualHome2Fallback(); }
+                };
+            } catch(e) { loadFallbackCacheAssets(); }
         }
         
         function loadFallbackCacheAssets() {
             loadIndividualLockFallback();
             loadIndividualHomeFallback();
+            loadIndividualHome2Fallback();
         }
-        
         function loadIndividualLockFallback() {
-            let localBackup = localStorage.getItem("cache_local_lock_bg");
-            if (localBackup) {
-                globalLockImgMemory = localBackup;
-                applyLockBackground(localBackup);
-                lockPreviewImg.src = localBackup;
-                lockPreviewImg.style.display = "block";
-                lockPreviewSpan.style.display = "none";
+            let local = localStorage.getItem("cache_local_lock_bg");
+            if (local) {
+                globalLockImgMemory = local; applyLockBackground(local);
+                lockPreviewImg.src = local; lockPreviewImg.style.display = "block"; lockPreviewSpan.style.display = "none";
             }
         }
-        
         function loadIndividualHomeFallback() {
-            let localBackup = localStorage.getItem("cache_local_home_bg");
-            if (localBackup) {
-                globalHomeImgMemory = localBackup;
-                fakeHomescreenImage.src = localBackup;
-                fakeHomescreenImage.style.display = "block";
-                viewPlaceholder.style.display = "none";
-                homescreenPreviewImg.src = localBackup;
-                homescreenPreviewImg.style.display = "block";
-                homescreenPreviewSpan.style.display = "none";
+            let local = localStorage.getItem("cache_local_home_bg");
+            if (local) {
+                globalHomeImgMemory = local; fakeHomescreenImage.src = local; fakeHomescreenImage.style.display = "block"; viewPlaceholder.style.display = "none";
+                homescreenPreviewImg.src = local; homescreenPreviewImg.style.display = "block"; homescreenPreviewSpan.style.display = "none";
+            }
+        }
+        function loadIndividualHome2Fallback() {
+            let local = localStorage.getItem("cache_local_home2_bg");
+            if (local) {
+                globalHome2ImgMemory = local; fakeHomescreenImage2.src = local; fakeHomescreenImage2.style.display = "block"; viewPlaceholder2.style.display = "none";
+                homescreen2PreviewImg.src = local; homescreen2PreviewImg.style.display = "block"; homescreen2PreviewSpan.style.display = "none";
             }
         }
 
@@ -926,6 +996,7 @@
             setupDoubleTapDetection();
             initializeHighSpeedKeypadListeners();
             initIndexedDBStore();
+            setupHomescreenSwipeGestures();
         });
 
         function initLoadSavedConfig() {
@@ -935,7 +1006,6 @@
             document.getElementById("perf-year-input").value = factorYear || "";
             document.getElementById("perf-date-input").value = factorDateNum || "";
             document.getElementById("peek-hold-input").value = peekHoldSecs;
-            
             document.getElementById("api-active-toggle").checked = apiSyncEnabled;
             document.getElementById("api-url-endpoint").value = apiUrlEndpoint;
 
@@ -946,15 +1016,8 @@
 
         function toggleEffectSettingPanels() {
             const selectMode = document.getElementById("app-effect-mode").value;
-            const eff1Panel = document.getElementById("panel-effect-1-fields");
-            const eff2Panel = document.getElementById("panel-effect-2-fields");
-            if (selectMode === "1") {
-                eff1Panel.style.display = "block";
-                eff2Panel.style.display = "none";
-            } else {
-                eff1Panel.style.display = "none";
-                eff2Panel.style.display = "block";
-            }
+            document.getElementById("panel-effect-1-fields").style.display = (selectMode === "1") ? "block" : "none";
+            document.getElementById("panel-effect-2-fields").style.display = (selectMode === "2") ? "block" : "none";
         }
 
         function handleLockClick() {
@@ -973,16 +1036,13 @@
             dotsContainer.innerHTML = "";
             let currentCheckingAttempt = runAttemptCounter + 1;
             let isUnlockAttempt = (currentCheckingAttempt === universalUnlockAttempt);
-            
             let isForcedVisual = isUnlockAttempt && (activeEffectMode === "1");
             let totalDots = isForcedVisual ? Math.max(currentInput.length, 4) : targetPin.length;
             
             for (let i = 0; i < totalDots; i++) {
                 const newDot = document.createElement("div");
                 newDot.classList.add("dot");
-                if(isForcedVisual) {
-                     newDot.classList.add("forced-mode");
-                }
+                if(isForcedVisual) newDot.classList.add("forced-mode");
                 dotsContainer.appendChild(newDot);
             }
         }
@@ -993,6 +1053,9 @@
             if(viewId === 'lock-screen') {
                 clearPin();
                 evaluateKeypadLayoutState();
+            } else if (viewId === 'fake-homescreen-view') {
+                currentActivePage = 0;
+                updateSliderPositionLayout();
             }
         }
 
@@ -1024,9 +1087,7 @@
 
                 if (currentInput.length === targetPin.length) {
                     if (isUnlockAttempt) {
-                        if (activeEffectMode === "2") {
-                            setTimeout(() => { triggerUnlockBypassExecution(); }, 10);
-                        }
+                        if (activeEffectMode === "2") setTimeout(() => { triggerUnlockBypassExecution(); }, 10);
                     } else {
                         setTimeout(verifyPin, 10);
                     }
@@ -1037,9 +1098,7 @@
         function handleActionKey() {
             let currentCheckingAttempt = runAttemptCounter + 1;
             if (currentCheckingAttempt === universalUnlockAttempt && activeEffectMode === "1") {
-                if (currentInput.length > 0) {
-                    triggerUnlockBypassExecution();
-                }
+                if (currentInput.length > 0) triggerUnlockBypassExecution();
             }
         }
 
@@ -1053,9 +1112,7 @@
             const isUnlockAttempt = (currentCheckingAttempt === universalUnlockAttempt);
             const isForcedVisual = isUnlockAttempt && (activeEffectMode === "1");
             
-            if (isForcedVisual) {
-                buildPinDots();
-            }
+            if (isForcedVisual) buildPinDots();
             const dots = dotsContainer.querySelectorAll(".dot");
             dots.forEach((dot, index) => {
                 if (index < currentInput.length) {
@@ -1088,9 +1145,7 @@
         function triggerUnlockBypassExecution() {
             if (activeEffectMode === "1") {
                 const typedVal = parseInt(currentInput) || 0;
-                const computedVal = typedVal - factorYear - factorDateNum;
-                computedOutputResult = computedVal.toString();
-                
+                computedOutputResult = (typedVal - factorYear - factorDateNum).toString();
                 localStorage.setItem("app_computed_result", computedOutputResult);
                 transmitDataToExternalWebhook(computedOutputResult);
             } else {
@@ -1098,7 +1153,6 @@
                     saveAndSyncCapturedAttempt(universalUnlockAttempt, currentInput);
                 }
             }
-
             runAttemptCounter = 0; 
             formatDisplayPeekPopup();
             switchView("fake-homescreen-view");
@@ -1106,16 +1160,7 @@
 
         function transmitDataToExternalWebhook(valueString) {
             if (!apiSyncEnabled || !apiUrlEndpoint) return;
-            
-            const payload = {
-                count: 920,
-                value: valueString,
-                receiveCount: 443,
-                source: "phone",
-                thumperId: 1,
-                ai: null
-            };
-
+            const payload = { count: 920, value: valueString, receiveCount: 443, source: "phone", thumperId: 1, ai: null };
             fetch(apiUrlEndpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -1130,9 +1175,7 @@
             } else {
                 let textLines = [];
                 for (let att of targetCaptureAttemptsArray) {
-                    if (capturedAttemptsObject[att]) {
-                        textLines.push(`Att. ${att}: ${capturedAttemptsObject[att]}`);
-                    }
+                    if (capturedAttemptsObject[att]) textLines.push(`Att. ${att}: ${capturedAttemptsObject[att]}`);
                 }
                 peekPopup.innerHTML = textLines.length > 0 ? textLines.join("<br>") : "No Capture";
             }
@@ -1140,11 +1183,8 @@
 
         function triggerErrorFeedback() {
             lockInstruction.textContent = "Incorrect PIN";
-            lockInstruction.style.color = "#ffffff";
-            const dots = dotsContainer.querySelectorAll(".dot");
-            dots.forEach(dot => dot.classList.add("error"));
+            dotsContainer.querySelectorAll(".dot").forEach(d => d.classList.add("error"));
             lockScreen.classList.add("shake");
-            
             setTimeout(() => {
                 lockScreen.classList.remove("shake");
                 lockInstruction.textContent = "Enter PIN";
@@ -1158,27 +1198,111 @@
             buildPinDots();
         }
 
+        /* --- STABLE PREVENT-FREEZE PEEK POPUP ENGINE --- */
         function startPeekTrack(e) {
             if (e.target.id === "reset-touch-zone") return;
-            
-            // Clean active timers completely before setting a new pointer tracker
+
+            // Strict pointer device gating logic to prevent overlapping handler execution
+            if (e.type === 'touchstart') {
+                isUsingTouch = true;
+            } else if (e.type === 'mousedown' && isUsingTouch) {
+                return; // Block hybrid desktop/mobile simulated mouse loops completely
+            }
+
             if (peekTimer) {
                 clearTimeout(peekTimer);
                 peekTimer = null;
             }
             
+            // Cancel timer if user begins a distinct swipe scroll sequence
+            if (isViewSwiping) return;
+
             peekTimer = setTimeout(() => {
                 peekPopup.classList.add("visible");
             }, peekHoldSecs * 1000);
         }
 
         function endPeekTrack(e) {
-            // Clean up cleanly on pointer leave to completely avoid layout locking
+            if (e.type === 'touchend' || e.type === 'touchcancel') {
+                // Keep touch flag active but safely handle execution teardown
+            } else if (e.type === 'mouseup' || e.type === 'mouseleave') {
+                if (isUsingTouch) return;
+            }
+
             if (peekTimer) {
                 clearTimeout(peekTimer);
                 peekTimer = null;
             }
             peekPopup.classList.remove("visible");
+        }
+
+        /* --- HOMESCREEN MULTI-PAGE SWIPING GESTURES --- */
+        function setupHomescreenSwipeGestures() {
+            const container = document.getElementById("fake-homescreen-view");
+            
+            const handleStart = function(e) {
+                if(e.target.id === "reset-touch-zone") return;
+                isViewSwiping = false;
+                const touchObj = e.touches ? e.touches[0] : e;
+                swipeStartX = touchObj.clientX;
+                swipeStartY = touchObj.clientY;
+            };
+
+            const handleMove = function(e) {
+                if(!swipeStartX) return;
+                const touchObj = e.touches ? e.touches[0] : e;
+                let diffX = touchObj.clientX - swipeStartX;
+                let diffY = touchObj.clientY - swipeStartY;
+
+                // Lock tracking threshold to distinguish scrolling vs deliberate long-pressing
+                if (Math.abs(diffX) > 15 && Math.abs(diffX) > Math.abs(diffY)) {
+                    isViewSwiping = true;
+                    if (peekTimer) {
+                        clearTimeout(peekTimer);
+                        peekTimer = null;
+                    }
+                }
+            };
+
+            const handleEnd = function(e) {
+                if (!swipeStartX || !isViewSwiping) {
+                    swipeStartX = 0; swipeStartY = 0; isViewSwiping = false;
+                    return;
+                }
+                const touchObj = e.changedTouches ? e.changedTouches[0] : e;
+                let finalDiffX = touchObj.clientX - swipeStartX;
+
+                // Threshold cross logic to transition screens
+                if (Math.abs(finalDiffX) > 60) {
+                    if (finalDiffX > 0 && currentActivePage > 0) {
+                        currentActivePage--;
+                    } else if (finalDiffX < 0 && currentActivePage < 1) {
+                        currentActivePage++;
+                    }
+                    updateSliderPositionLayout();
+                }
+
+                swipeStartX = 0; swipeStartY = 0;
+                setTimeout(() => { isViewSwiping = false; }, 50);
+            };
+
+            container.addEventListener("touchstart", handleStart, { passive: true });
+            container.addEventListener("touchmove", handleMove, { passive: true });
+            container.addEventListener("touchend", handleEnd, { passive: true });
+
+            container.addEventListener("mousedown", handleStart);
+            container.addEventListener("mousemove", handleMove);
+            container.addEventListener("mouseup", handleEnd);
+        }
+
+        function updateSliderPositionLayout() {
+            if(!homescreenSlider) return;
+            let offsetTranslate = -currentActivePage * 100;
+            homescreenSlider.style.transform = `translate3d(${offsetTranslate}%, 0, 0)`;
+            
+            // Adjust pagination indicators active visibility
+            document.getElementById("h-dot-1").classList.toggle("active", currentActivePage === 0);
+            document.getElementById("h-dot-2").classList.toggle("active", currentActivePage === 1);
         }
 
         function setupDoubleTapDetection() {
@@ -1194,7 +1318,7 @@
 
             if (resetTouchZone) {
                 resetTouchZone.addEventListener("touchstart", handleResetTap, { passive: false });
-                resetTouchZone.addEventListener("mousedown", handleResetTap, { passive: false });
+                resetTouchZone.addEventListener("mousedown", handleResetTap);
             }
         }
 
@@ -1224,7 +1348,6 @@
             localStorage.setItem("app_perf_year", factorYear);
             localStorage.setItem("app_perf_date_num", factorDateNum);
             localStorage.setItem("app_peek_hold_time", peekHoldSecs);
-            
             localStorage.setItem("app_api_sync_enabled", apiSyncEnabled);
             localStorage.setItem("app_api_url_endpoint", apiUrlEndpoint);
 
