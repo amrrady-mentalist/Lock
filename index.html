@@ -112,8 +112,8 @@
             justify-content: center;
             gap: 12px;
             min-height: 14px;
-            /* Shifted exactly 2mm down for cleaner visual hierarchy */
-            transform: translateY(2mm); 
+            /* Exactly 2 millimeters down layout modification */
+            transform: translateY(2mm);
         }
 
         .dot {
@@ -129,7 +129,7 @@
         .dot.filled {
             background: #fff;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
-            transform: scale(1.15) translateY(2mm);
+            transform: scale(1.15);
         }
         
         .dot.error {
@@ -298,35 +298,33 @@
             opacity: 1;
         }
 
-        /* --- SETTINGS SCREEN (Pitch Black Dark Mode + Material U3 Styling) --- */
+        /* --- SETTINGS SCREEN --- */
         #settings-screen {
-            background-color: #000000; /* Pure pitch black */
-            color: #e6e1e5; /* Material U dark text M3 style */
+            background-color: #121212;
+            color: #ffffff;
             padding: calc(30px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)) 20px;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch;
         }
 
         #settings-screen header h1 {
-            font-size: 28px;
-            font-weight: 400;
-            letter-spacing: -0.5px;
-            color: #fff;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
         }
 
         .settings-group {
-            margin-top: 15px;
-            background: #1c1b1f; /* M3 Surface container dark */
-            border: 1px solid #49454f; /* M3 Outline Variant */
-            border-radius: 16px; /* Smooth rounded M3 shape */
-            padding: 20px;
-            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
         }
 
         .settings-group label {
             display: block;
-            font-size: 12px;
-            color: #cac4d0; /* M3 On-surface variant */
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -337,38 +335,33 @@
         .settings-group input[type="number"],
         .settings-group input[type="url"] {
             width: 100%;
-            background: #2b2930; /* M3 Surface container high */
-            border: 1px solid #49454f;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             color: #fff;
-            padding: 14px;
+            padding: 12px;
             border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 15px;
+            font-size: 15px;
+            margin-bottom: 14px;
             outline: none;
             text-align: center;
             user-select: text !important;
             -webkit-user-select: text !important;
-            transition: border-color 0.2s;
-        }
-
-        .settings-group input:focus {
-            border-color: #d0bcff; /* M3 Primary color */
         }
 
         .select-input-wrapper {
             position: relative;
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
 
         .settings-group select {
             width: 100%;
-            background: #2b2930;
-            border: 1px solid #49454f;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: #ffffff;
-            padding: 14px 40px 14px 14px;
+            padding: 12px 40px 12px 12px;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             outline: none;
             text-align: center;
             text-align-last: center;
@@ -376,15 +369,14 @@
             -webkit-appearance: none;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .native-system-gallery-row {
-            background: #211f26; /* M3 Surface Container Low */
-            border: 1px dashed #938f99;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -394,52 +386,50 @@
 
         .gallery-helper-prompt {
             font-size: 14px !important;
-            color: #d0bcff !important; /* M3 Light Accent */
+            color: rgba(255,255,255,0.85) !important;
             text-transform: none !important;
             letter-spacing: 0px !important;
             margin-bottom: 2px !important;
-            text-align: center;
-            font-weight: 600;
         }
 
         .url-input-container {
             display: flex;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
 
         .url-input-container input[type="url"] {
             margin-bottom: 0 !important;
             text-align: left !important;
-            padding: 10px 14px;
+            padding: 10px 12px;
             font-size: 14px;
             flex: 1;
         }
 
         .btn-inline-fetch {
-            background: #4f378b; /* M3 Secondary container */
-            color: #e8def8;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
             border: none;
             padding: 0 16px;
             border-radius: 8px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
         }
-        .btn-inline-fetch:active { background: #381e72; }
+        .btn-inline-fetch:active { background: rgba(255, 255, 255, 0.25); }
 
         .preview-container {
             width: 100%;
             height: 100px;
-            border-radius: 12px;
-            background: #141218;
-            border: 1px solid #49454f;
-            margin-top: 10px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            color: #79747e;
+            color: rgba(255, 255, 255, 0.4);
             font-size: 13px;
         }
 
@@ -448,45 +438,35 @@
             object-fit: cover; display: none;
         }
 
-        /* Pill-shaped Material U design buttons */
         .btn {
             width: 100%;
             padding: 14px;
-            border-radius: 100px; /* High-radius pill shape */
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             border: none;
             text-align: center;
-            letter-spacing: .1px;
         }
 
-        .btn-primary { 
-            background: #d0bcff; /* M3 Primary Light variant */
-            color: #381e72; 
-            margin-bottom: 12px; 
-        }
-        .btn-primary:active { background: #b69df8; }
+        .btn-primary { background: #ffffff; color: #000000; margin-bottom: 12px; }
+        .btn-primary:active { background: rgba(255, 255, 255, 0.85); }
 
-        .btn-secondary { 
-            background: transparent; 
-            color: #cac4d0; 
-            border: 1px solid #79747e; 
-        }
-        .btn-secondary:active { background: rgba(230, 225, 230, 0.08); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); }
+        .btn-secondary:active { background: rgba(255, 255, 255, 0.15); }
         
         .toggle-container {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 15px;
-            background: #2b2930;
-            padding: 14px;
-            border-radius: 12px;
-            border: 1px solid #49454f;
+            margin-bottom: 14px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .toggle-container label { margin-bottom: 0; text-transform: none; font-size: 15px; color: #fff;}
-        .toggle-container input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: #d0bcff; }
+        .toggle-container label { margin-bottom: 0; text-transform: none; font-size: 14px; }
+        .toggle-container input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -526,6 +506,7 @@
         </div>
     </div>
 
+    <!-- Container matching image reference verbatim file 231059.jpg layout -->
     <div id="fake-homescreen-view" class="view hidden" onmousedown="startPeekTrack(event)" onmouseup="endPeekTrack(event)" onmouseleave="endPeekTrack(event)" ontouchstart="startPeekTrack(event)" ontouchend="endPeekTrack(event)" ontouchcancel="endPeekTrack(event)">
         <img id="fake-homescreen-image" alt="Fake Home Screen ScreenShot">
         <div id="view-placeholder" class="placeholder-text">No home screen screenshot uploaded yet. Triple click lock icon to configure.</div>
@@ -536,7 +517,7 @@
     </div>
 
     <div id="settings-screen" class="view hidden">
-        <header style="padding-bottom: 14px; border-bottom: 1px solid #49454f; margin-bottom: 15px;">
+        <header style="padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 20px;">
             <h1>Hidden Config</h1>
         </header>
 
@@ -1180,8 +1161,11 @@
         function startPeekTrack(e) {
             if (e.target.id === "reset-touch-zone") return;
             
-            // Clean dynamic states before firing timer
-            clearTimeout(peekTimer); 
+            // Clean active timers completely before setting a new pointer tracker
+            if (peekTimer) {
+                clearTimeout(peekTimer);
+                peekTimer = null;
+            }
             
             peekTimer = setTimeout(() => {
                 peekPopup.classList.add("visible");
@@ -1189,7 +1173,7 @@
         }
 
         function endPeekTrack(e) {
-            // Instantly clear the running tracker execution sequence loops
+            // Clean up cleanly on pointer leave to completely avoid layout locking
             if (peekTimer) {
                 clearTimeout(peekTimer);
                 peekTimer = null;
