@@ -12,7 +12,7 @@
     <title>Magic Trick App</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@600;700&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@600;700&family=Teko:wght@500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -68,7 +68,7 @@
 
         /* --- WAKE / AMBIENT CLOCK SCREEN --- */
         #wake-screen {
-            background-color: #000000;
+            background-color: transparent;
             align-items: center;
             justify-content: flex-start;
             padding: calc(70px + env(safe-area-inset-top)) 0 calc(30px + env(safe-area-inset-bottom)) 0;
@@ -77,30 +77,23 @@
             transition: background-color 0.45s ease, opacity 0.25s ease, transform 0.25s ease;
         }
 
-        /* Once awake, the opaque black lifts and reveals the SAME body background
-           used by the lock screen (set via applyLockBackground in settings) so both
-           screens always share whatever wallpaper the user has configured. */
-        #wake-screen.awake {
-            background-color: transparent;
-        }
-
         /* Subtle top/bottom vignette so glass text stays legible over any wallpaper,
-           matching the contrast treatment real lock screens use. */
+           matching the contrast treatment real lock screens use. Always on so the
+           ambient clock screen reads clearly as soon as it's shown. */
         #wake-screen::before {
             content: "";
             position: absolute;
             inset: 0;
             background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 62%, rgba(0,0,0,0.5) 100%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
+            opacity: 1;
             pointer-events: none;
             z-index: 0;
         }
 
-        #wake-screen.awake::before {
-            opacity: 1;
-        }
-
+        /* Single, always-visible ambient screen: lock icon + date pinned near the
+           top, the clock centered in the middle of the remaining space, and the
+           flashlight/camera row pinned near the bottom -- all present together,
+           nothing gated behind a separate "wake" or "bright" interaction state. */
         .wake-content {
             position: relative;
             width: 100%;
@@ -115,11 +108,6 @@
 
         .wake-content.dragging {
             transition: none;
-        }
-
-        #wake-screen:not(.awake) .wake-content {
-            opacity: 0;
-            pointer-events: none;
         }
 
         /* Reuses the exact same padlock glyph/style as the PIN screen icon above */
@@ -142,66 +130,80 @@
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         }
 
-        /* Liquid-glass date text: same frosted gradient-fill treatment as the clock */
+        /* Liquid-glass date text: same frosted, milky glass treatment as the
+           clock below but at a reduced scale/opacity so the two stay in visual
+           harmony while the clock remains the dominant element. */
         .wake-date-row span {
-            background: linear-gradient(160deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.5) 100%);
+            background: linear-gradient(155deg, rgba(215, 219, 226, 0.8) 0%, rgba(175, 183, 194, 0.6) 50%, rgba(140, 150, 162, 0.4) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             -webkit-text-fill-color: transparent;
-            transition: background 0.4s ease;
+            -webkit-text-stroke: 0.25px rgba(220, 224, 230, 0.3);
+            text-shadow:
+                0 0 2px rgba(255, 255, 255, 0.3),
+                0 0 8px rgba(200, 208, 218, 0.18),
+                0 3px 8px rgba(0, 0, 0, 0.3);
         }
 
-        #wake-screen.bright .wake-date-row span {
-            background: linear-gradient(160deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.85) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
+        /* Vertically centers the clock in the middle of the screen, in the
+           space between the top icon/date group and the bottom icon row. */
+        .wake-clock-wrap {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Liquid-glass clock: gradient frosted-glass fill with an etched outline
-           so the blurred wallpaper reads faintly through the glyphs, brightening
-           into a solid frosted-white sheen as the screen wakes up further.
-           Teko is a genuinely tall/condensed display face, so it reads big and
-           tall at a normal, non-stretched aspect ratio. text-align:justify on
-           this single line pushes "HH" flush left and "MM" flush right (same
-           width/inset as the date row above) without splitting into elements. */
+        /* Liquid-glass clock: bold, oversized molten-glass fill. A milky-white
+           gradient lets the dark backdrop bleed through like frosted/refractive
+           glass; a thin bright stroke gives each glyph a polished edge; layered
+           text-shadows build a soft frosted diffusion, a luminous halo, a
+           cooler outer refraction glow, and a soft grounding drop shadow so the
+           digits read as thick, frosted, three-dimensional liquid glass suspended
+           over the wallpaper. Bebas Neue is a genuinely tall/condensed display
+           face (Teko kept as fallback) so it reads big and bold at a normal,
+           non-stretched aspect ratio. Hours stack directly above minutes via
+           two block-level spans. Nudged up ~1cm from center via translateY. */
         .wake-clock {
             width: 100%;
             max-width: 360px;
             margin: 0 auto;
             padding: 0 42px;
             box-sizing: border-box;
-            text-align: justify;
-            text-align-last: justify;
-            font-family: 'Teko', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            font-size: clamp(140px, 40vw, 230px);
-            font-weight: 600;
-            letter-spacing: 0px;
-            line-height: 0.85;
-            margin-top: 4px;
-            margin-bottom: 14px;
-            background: linear-gradient(165deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.18) 45%, rgba(180, 195, 215, 0.08) 100%);
+            text-align: center;
+            font-family: 'Bebas Neue', 'Teko', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: clamp(140px, 37vw, 225px);
+            font-weight: 700;
+            letter-spacing: 1px;
+            line-height: 0.9;
+            transform: translateY(-1cm);
+            background: linear-gradient(155deg, rgba(228, 232, 238, 0.8) 0%, rgba(195, 202, 212, 0.62) 30%, rgba(160, 170, 182, 0.48) 65%, rgba(125, 135, 148, 0.35) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             -webkit-text-fill-color: transparent;
-            -webkit-text-stroke: 0.6px rgba(255, 255, 255, 0.4);
-            text-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-            transition: background 0.4s ease, text-shadow 0.4s ease, -webkit-text-stroke 0.4s ease;
+            -webkit-text-stroke: 1px rgba(230, 233, 238, 0.4);
+            text-shadow:
+                0 0 5px rgba(255, 255, 255, 0.4),
+                0 0 16px rgba(215, 220, 228, 0.3),
+                0 0 34px rgba(170, 182, 200, 0.24),
+                0 0 60px rgba(140, 155, 175, 0.14),
+                0 8px 22px rgba(0, 0, 0, 0.42);
+            filter: blur(0.4px) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.28));
         }
 
-        #wake-screen.bright .wake-clock {
-            background: linear-gradient(165deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.65) 45%, rgba(255, 255, 255, 0.4) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-stroke: 0px transparent;
-            text-shadow: 0 2px 25px rgba(255, 255, 255, 0.18), 0 4px 30px rgba(0, 0, 0, 0.35);
+        /* Hours stacked above minutes: each unit is its own block line so the
+           clock reads top-to-bottom and centered instead of left/right justified. */
+        .wake-clock span {
+            display: block;
         }
 
         /* Bottom quick-action row, pushed down near the very bottom edge and
            out toward the corners like a real ambient/lock screen, sharing the
            same frosted-glass circle language as the PIN keypad (.key) elsewhere
-           in the app. */
+           in the app. Always visible alongside the rest of the ambient screen. */
         .wake-bottom-icons {
             position: absolute;
             left: 0;
@@ -211,12 +213,6 @@
             justify-content: space-between;
             align-items: center;
             padding: 0 22px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        #wake-screen.bright .wake-bottom-icons {
-            opacity: 1;
         }
 
         .wake-glass-icon {
@@ -253,12 +249,28 @@
         }
 
         .lock-header {
+            position: relative;
             text-align: center;
             color: #fff;
             display: flex;
             flex-direction: column;
             align-items: center;
             margin-top: 20px;
+        }
+
+        /* Invisible double-tap zone sitting in the gap between the PIN dots
+           and the keypad. Absolutely positioned off the bottom of the header
+           so it never participates in the flex layout above -- existing
+           spacing/alignment of the lock screen is untouched. Double-tapping
+           it shows the pitch-black blackout screen. */
+        .blackout-touch-zone {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            height: 90px;
+            background: transparent;
+            touch-action: manipulation;
         }
 
         .lock-svg-container {
@@ -411,6 +423,20 @@
             20%, 80% { transform: translate3d(2px, 0, 0); }
             30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
             40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* --- BLACKOUT SCREEN (double-tap on lock screen, above dial pad) --- */
+        #blackout-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #000000;
+            z-index: 9999;
+            display: none;
+            touch-action: none;
+        }
+
+        #blackout-screen.active {
+            display: block;
         }
 
         /* --- REVEAL VIEW & CAROUSEL --- */
@@ -693,7 +719,7 @@
 </head>
 <body>
 
-    <div id="wake-screen" class="view">
+    <div id="wake-screen" class="view hidden">
         <div class="wake-content" id="wake-content">
             <div class="lock-svg-container wake-lock-icon">
                 <svg viewBox="0 0 24 24">
@@ -704,7 +730,9 @@
                 <span id="wake-date-label">--- -</span>
                 <span id="wake-day-label">---</span>
             </div>
-            <div class="wake-clock" id="wake-clock-label">00 00</div>
+            <div class="wake-clock-wrap">
+                <div class="wake-clock" id="wake-clock-label"><span id="wake-hour-label">00</span><span id="wake-minute-label">00</span></div>
+            </div>
             <div class="wake-bottom-icons">
                 <div class="wake-glass-icon" aria-label="Flashlight">
                     <svg viewBox="0 0 24 24">
@@ -731,6 +759,7 @@
             </div>
             <div class="lock-status" id="lock-instruction">Enter PIN</div>
             <div class="pin-dots" id="dots-container"></div>
+            <div class="blackout-touch-zone" id="blackout-touch-zone"></div>
         </div>
 
         <div class="keypad-container">
@@ -756,6 +785,8 @@
             </div>
         </div>
     </div>
+
+    <div id="blackout-screen" class="active"></div>
 
     <div id="fake-homescreen-view" class="view hidden">
         <div class="carousel-viewport" id="carousel-viewport">
@@ -911,11 +942,12 @@
         const wakeScreen = document.getElementById("wake-screen");
         const wakeContent = document.getElementById("wake-content");
         const wakeClockLabel = document.getElementById("wake-clock-label");
+        const wakeHourLabel = document.getElementById("wake-hour-label");
+        const wakeMinuteLabel = document.getElementById("wake-minute-label");
         const wakeDateLabel = document.getElementById("wake-date-label");
         const wakeDayLabel = document.getElementById("wake-day-label");
 
         let wakeClockInterval = null;
-        let wakeLastTapTime = 0;
         let wakeIsDragging = false;
         let wakeStartY = 0;
         let wakeCurrentY = 0;
@@ -942,6 +974,10 @@
         const viewPlaceholder = document.getElementById("view-placeholder");
         const peekPopup = document.getElementById("peek-popup");
         const resetTouchZone = document.getElementById("reset-touch-zone");
+        const blackoutTouchZone = document.getElementById("blackout-touch-zone");
+        const blackoutScreen = document.getElementById("blackout-screen");
+        let lastBlackoutTapTime = 0;
+        let lastBlackoutDismissTapTime = 0;
 
         document.addEventListener("deviceready", onDeviceReady, false);
 
@@ -1354,6 +1390,7 @@
             initLoadSavedConfig();
             buildPinDots();
             setupDoubleTapDetection();
+            setupBlackoutFeature();
             initializeHighSpeedKeypadListeners();
             initIndexedDBStore();
             registerFakeHomeScreenGestures();
@@ -1365,7 +1402,8 @@
             const now = new Date();
             const hh = now.getHours().toString().padStart(2, "0");
             const mm = now.getMinutes().toString().padStart(2, "0");
-            if (wakeClockLabel) wakeClockLabel.textContent = `${hh} ${mm}`;
+            if (wakeHourLabel) wakeHourLabel.textContent = hh;
+            if (wakeMinuteLabel) wakeMinuteLabel.textContent = mm;
 
             const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
             const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -1383,40 +1421,23 @@
         function resetWakeScreenState() {
             wakeTransitionCommitted = false;
             wakeIsDragging = false;
-            if (wakeScreen) wakeScreen.classList.remove("awake", "bright");
             if (wakeContent) {
                 wakeContent.classList.remove("dragging");
                 wakeContent.style.transform = "";
                 wakeContent.style.opacity = "";
-            }
-            if (wakeClockInterval) {
-                clearInterval(wakeClockInterval);
-                wakeClockInterval = null;
             }
         }
 
         function setupWakeScreenGestures() {
             if (!wakeScreen || !wakeContent) return;
 
-            const handleWakeTap = function(e) {
-                if (wakeScreen.classList.contains("awake")) return;
-                const now = Date.now();
-                const tapLength = now - wakeLastTapTime;
-                if (tapLength < 450 && tapLength > 0) {
-                    wakeScreen.classList.add("awake");
-                    startWakeClockTicking();
-                }
-                wakeLastTapTime = now;
-            };
-
             const startDrag = function(e) {
-                if (!wakeScreen.classList.contains("awake") || wakeTransitionCommitted) return;
+                if (wakeTransitionCommitted) return;
                 const point = e.touches ? e.touches[0] : e;
                 wakeIsDragging = true;
                 wakeStartY = point.clientY;
                 wakeCurrentY = wakeStartY;
                 wakeContent.classList.add("dragging");
-                wakeScreen.classList.add("bright");
             };
 
             const moveDrag = function(e) {
@@ -1449,9 +1470,6 @@
                     wakeContent.style.opacity = "";
                 }
             };
-
-            wakeScreen.addEventListener("touchend", handleWakeTap, { passive: true });
-            wakeScreen.addEventListener("mouseup", handleWakeTap);
 
             wakeScreen.addEventListener("touchstart", startDrag, { passive: true });
             wakeScreen.addEventListener("touchmove", moveDrag, { passive: true });
@@ -1525,6 +1543,12 @@
         function switchView(viewId) {
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById(viewId).classList.remove('hidden');
+            if (viewId === 'wake-screen') {
+                startWakeClockTicking();
+            } else if (wakeClockInterval) {
+                clearInterval(wakeClockInterval);
+                wakeClockInterval = null;
+            }
             if(viewId === 'lock-screen') {
                 clearPin();
                 evaluateKeypadLayoutState();
@@ -1711,6 +1735,45 @@
                 resetTouchZone.addEventListener("touchstart", handleResetTap, { passive: false });
                 resetTouchZone.addEventListener("mousedown", handleResetTap, { passive: false });
             }
+        }
+
+        function setupBlackoutFeature() {
+            if (blackoutTouchZone) {
+                const handleBlackoutZoneTap = function(e) {
+                    e.preventDefault();
+                    let currentTime = new Date().getTime();
+                    let tapLength = currentTime - lastBlackoutTapTime;
+                    if (tapLength < 300 && tapLength > 0) {
+                        showBlackoutScreen();
+                    }
+                    lastBlackoutTapTime = currentTime;
+                };
+                blackoutTouchZone.addEventListener("touchstart", handleBlackoutZoneTap, { passive: false });
+                blackoutTouchZone.addEventListener("mousedown", handleBlackoutZoneTap, { passive: false });
+            }
+
+            if (blackoutScreen) {
+                const handleBlackoutDismiss = function(e) {
+                    e.preventDefault();
+                    let currentTime = new Date().getTime();
+                    let tapLength = currentTime - lastBlackoutDismissTapTime;
+                    if (tapLength < 300 && tapLength > 0) {
+                        hideBlackoutScreen();
+                        switchView("wake-screen");
+                    }
+                    lastBlackoutDismissTapTime = currentTime;
+                };
+                blackoutScreen.addEventListener("touchstart", handleBlackoutDismiss, { passive: false });
+                blackoutScreen.addEventListener("mousedown", handleBlackoutDismiss, { passive: false });
+            }
+        }
+
+        function showBlackoutScreen() {
+            if (blackoutScreen) blackoutScreen.classList.add("active");
+        }
+
+        function hideBlackoutScreen() {
+            if (blackoutScreen) blackoutScreen.classList.remove("active");
         }
 
         function applyLockBackground(bgDataString) {
