@@ -114,6 +114,7 @@
         .wake-lock-icon {
             margin-bottom: 18px;
             opacity: 0.95;
+            transform: translateY(-1cm);
         }
 
         .wake-date-row {
@@ -128,6 +129,7 @@
             margin-bottom: 2px;
             box-sizing: border-box;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            transform: translateY(-1cm);
         }
 
         /* Liquid-glass date text: same frosted, milky glass treatment as the
@@ -156,42 +158,34 @@
             justify-content: center;
         }
 
-        /* Liquid-glass clock: bold, oversized molten-glass fill. A milky-white
-           gradient lets the dark backdrop bleed through like frosted/refractive
-           glass; a thin bright stroke gives each glyph a polished edge; layered
-           text-shadows build a soft frosted diffusion, a luminous halo, a
-           cooler outer refraction glow, and a soft grounding drop shadow so the
-           digits read as thick, frosted, three-dimensional liquid glass suspended
-           over the wallpaper. Bebas Neue is a genuinely tall/condensed display
-           face (Teko kept as fallback) so it reads big and bold at a normal,
-           non-stretched aspect ratio. Hours stack directly above minutes via
-           two block-level spans. Nudged up ~1cm from center via translateY. */
-        .wake-clock {
-            width: 100%;
-            max-width: 360px;
-            margin: 0 auto;
-            padding: 0 42px;
-            box-sizing: border-box;
-            text-align: center;
-            font-family: 'Bebas Neue', 'Teko', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            font-size: clamp(140px, 37vw, 225px);
-            font-weight: 700;
-            letter-spacing: 1px;
-            line-height: 0.9;
+        /* No panel/box here anymore -- just a positioning wrapper so the
+           clock can be nudged up ~1cm without disturbing the flex centering. */
+        .wake-clock-panel {
+            display: inline-block;
             transform: translateY(-1cm);
-            background: linear-gradient(155deg, rgba(228, 232, 238, 0.8) 0%, rgba(195, 202, 212, 0.62) 30%, rgba(160, 170, 182, 0.48) 65%, rgba(125, 135, 148, 0.35) 100%);
+        }
+
+        /* Same font and same liquid-glass treatment as the date row above
+           (.wake-date-row span) -- just scaled up to the clock's large size,
+           so the two elements read as one consistent design. Hours stack
+           directly above minutes via two block-level spans. */
+        .wake-clock {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: clamp(196px, 52vw, 315px);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            line-height: 0.9;
+            text-align: center;
+            background: linear-gradient(155deg, rgba(215, 219, 226, 0.8) 0%, rgba(175, 183, 194, 0.6) 50%, rgba(140, 150, 162, 0.4) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             -webkit-text-fill-color: transparent;
-            -webkit-text-stroke: 1px rgba(230, 233, 238, 0.4);
+            -webkit-text-stroke: 0.25px rgba(220, 224, 230, 0.3);
             text-shadow:
-                0 0 5px rgba(255, 255, 255, 0.4),
-                0 0 16px rgba(215, 220, 228, 0.3),
-                0 0 34px rgba(170, 182, 200, 0.24),
-                0 0 60px rgba(140, 155, 175, 0.14),
-                0 8px 22px rgba(0, 0, 0, 0.42);
-            filter: blur(0.4px) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.28));
+                0 0 2px rgba(255, 255, 255, 0.3),
+                0 0 8px rgba(200, 208, 218, 0.18),
+                0 3px 8px rgba(0, 0, 0, 0.3);
         }
 
         /* Hours stacked above minutes: each unit is its own block line so the
@@ -731,7 +725,9 @@
                 <span id="wake-day-label">---</span>
             </div>
             <div class="wake-clock-wrap">
-                <div class="wake-clock" id="wake-clock-label"><span id="wake-hour-label">00</span><span id="wake-minute-label">00</span></div>
+                <div class="wake-clock-panel">
+                    <div class="wake-clock" id="wake-clock-label"><span id="wake-hour-label">00</span><span id="wake-minute-label">00</span></div>
+                </div>
             </div>
             <div class="wake-bottom-icons">
                 <div class="wake-glass-icon" aria-label="Flashlight">
