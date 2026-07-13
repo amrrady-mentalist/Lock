@@ -165,17 +165,20 @@
             transform: translateY(-1cm);
         }
 
-        /* Same font and same liquid-glass treatment as the date row above
-           (.wake-date-row span) -- just scaled up to the clock's large size,
-           so the two elements read as one consistent design. Hours stack
-           directly above minutes via two block-level spans. */
+        /* Updated inline, ultra-tall clock design */
         .wake-clock {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            font-size: clamp(196px, 52vw, 315px);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(110px, 32vw, 170px);
             font-weight: 400;
-            letter-spacing: 0.3px;
-            line-height: 0.9;
+            letter-spacing: 2px;
+            line-height: 1;
             text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: scaleY(2.2); /* Creates the ultra-tall stretched effect */
+            transform-origin: center;
+            margin-top: 45px; /* Pushes the scaled text down slightly to prevent overlapping the date */
             background: linear-gradient(155deg, rgba(215, 219, 226, 0.8) 0%, rgba(175, 183, 194, 0.6) 50%, rgba(140, 150, 162, 0.4) 100%);
             -webkit-background-clip: text;
             background-clip: text;
@@ -188,10 +191,9 @@
                 0 3px 8px rgba(0, 0, 0, 0.3);
         }
 
-        /* Hours stacked above minutes: each unit is its own block line so the
-           clock reads top-to-bottom and centered instead of left/right justified. */
+        /* Displays the hours and minutes side-by-side instead of stacked */
         .wake-clock span {
-            display: block;
+            display: inline-block;
         }
 
         /* Bottom quick-action row, pushed down near the very bottom edge and
