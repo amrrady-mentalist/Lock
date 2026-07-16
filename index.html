@@ -165,33 +165,41 @@
             transform: translateY(-1cm);
         }
 
-        /* Updated inline, ultra-tall clock design */
+        /* Real Liquid Glass UI Clock */
         .wake-clock {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(110px, 32vw, 170px);
-            font-weight: 400;
-            letter-spacing: 2px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: clamp(100px, 28vw, 160px);
+            font-weight: 300; /* Lighter weight for a sleeker glass aesthetic */
+            letter-spacing: -1px;
             line-height: 1;
             text-align: center;
             display: flex;
             justify-content: center;
             align-items: center;
-            transform: scaleY(2.2); /* Creates the ultra-tall stretched effect */
-            transform-origin: center;
-            margin-top: 45px; /* Pushes the scaled text down slightly to prevent overlapping the date */
-            background: linear-gradient(155deg, rgba(215, 219, 226, 0.8) 0%, rgba(175, 183, 194, 0.6) 50%, rgba(140, 150, 162, 0.4) 100%);
+            gap: 6px; /* Slight separation between hours and minutes */
+            margin-top: 25px; 
+            
+            /* High-contrast gradient simulating light passing through glass */
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.95) 0%, 
+                rgba(255, 255, 255, 0.25) 45%, 
+                rgba(255, 255, 255, 0.1) 55%, 
+                rgba(255, 255, 255, 0.6) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             -webkit-text-fill-color: transparent;
-            -webkit-text-stroke: 0.25px rgba(220, 224, 230, 0.3);
+            
+            /* Sharp, illuminated glass edge */
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5);
+            
+            /* Deep ambient shadow pushing the 'glass' forward */
             text-shadow:
-                0 0 2px rgba(255, 255, 255, 0.3),
-                0 0 8px rgba(200, 208, 218, 0.18),
-                0 3px 8px rgba(0, 0, 0, 0.3);
+                0 10px 25px rgba(0, 0, 0, 0.4),
+                0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
-        /* Displays the hours and minutes side-by-side instead of stacked */
+        /* Displays the hours and minutes side-by-side */
         .wake-clock span {
             display: inline-block;
         }
