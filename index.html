@@ -12,8 +12,8 @@
     <title>Magic Trick App</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Imported Inter as a highly accurate web-safe fallback for MiSans -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Roboto+Condensed:wght@600;700&family=Teko:wght@500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <!-- Updated Inter import to include bolder weights (700, 800) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&family=Roboto+Condensed:wght@600;700&family=Teko:wght@500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -169,16 +169,16 @@
         /* Enlarged, Stacked Liquid Glass UI Clock */
         .wake-clock {
             font-family: 'MiSans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            font-size: clamp(140px, 42vw, 220px); /* Significantly enlarged */
-            font-weight: 300; 
+            font-size: clamp(140px, 42vw, 220px); 
+            font-weight: 800; /* Increased to 800 for a much thicker, bolder profile */
             letter-spacing: -2px;
-            line-height: 0.85; /* Tighter line-height to keep stacked digits cohesive */
+            line-height: 0.85; 
             text-align: center;
             display: flex;
-            flex-direction: column; /* Stacks the HH above MM */
+            flex-direction: column; 
             justify-content: center;
             align-items: center;
-            margin-top: 15px; /* Fine-tuned for perfect centering */
+            margin-top: 15px; 
             
             /* High-contrast gradient simulating light passing through glass */
             background: linear-gradient(135deg, 
@@ -191,8 +191,8 @@
             color: transparent;
             -webkit-text-fill-color: transparent;
             
-            /* Sharp, illuminated glass edge */
-            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.5);
+            /* Sharp, illuminated glass edge - thickened to match the bold font */
+            -webkit-text-stroke: 2.5px rgba(255, 255, 255, 0.55);
             
             /* Deep ambient shadow pushing the 'glass' forward */
             text-shadow:
