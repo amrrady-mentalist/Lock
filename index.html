@@ -12,7 +12,7 @@
     <title>Magic Trick App</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@600;700&family=Teko:wght@500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&family=Roboto+Condensed:wght@600;700&family=Teko:wght@500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -77,9 +77,6 @@
             transition: background-color 0.45s ease, opacity 0.25s ease, transform 0.25s ease;
         }
 
-        /* Subtle top/bottom vignette so glass text stays legible over any wallpaper,
-           matching the contrast treatment real lock screens use. Always on so the
-           ambient clock screen reads clearly as soon as it's shown. */
         #wake-screen::before {
             content: "";
             position: absolute;
@@ -90,10 +87,6 @@
             z-index: 0;
         }
 
-        /* Single, always-visible ambient screen: lock icon + date pinned near the
-           top, the clock centered in the middle of the remaining space, and the
-           flashlight/camera row pinned near the bottom -- all present together,
-           nothing gated behind a separate "wake" or "bright" interaction state. */
         .wake-content {
             position: relative;
             width: 100%;
@@ -110,7 +103,6 @@
             transition: none;
         }
 
-        /* Reuses the exact same padlock glyph/style as the PIN screen icon above */
         .wake-lock-icon {
             margin-bottom: 18px;
             opacity: 0.95;
@@ -132,9 +124,6 @@
             transform: translateY(-1cm);
         }
 
-        /* Liquid-glass date text: same frosted, milky glass treatment as the
-           clock below but at a reduced scale/opacity so the two stay in visual
-           harmony while the clock remains the dominant element. */
         .wake-date-row span {
             background: linear-gradient(155deg, rgba(215, 219, 226, 0.8) 0%, rgba(175, 183, 194, 0.6) 50%, rgba(140, 150, 162, 0.4) 100%);
             -webkit-background-clip: text;
@@ -148,8 +137,6 @@
                 0 3px 8px rgba(0, 0, 0, 0.3);
         }
 
-        /* Vertically centers the clock in the middle of the screen, in the
-           space between the top icon/date group and the bottom icon row. */
         .wake-clock-wrap {
             flex: 1;
             width: 100%;
@@ -158,16 +145,16 @@
             justify-content: center;
         }
 
-        /* No panel/box here anymore -- just a positioning wrapper so the
-           clock can be nudged up ~1cm without disturbing the flex centering. */
+        /* Uses the Custom SVG Filter to draw an outline around the rasterized pixels, avoiding overlapping vector paths */
         .wake-clock-panel {
             display: inline-block;
             transform: translateY(-1cm);
+            filter: url(#glass-stroke) drop-shadow(0 10px 25px rgba(0,0,0,0.5)) drop-shadow(0 2px 8px rgba(0,0,0,0.3));
         }
 
-        /* Enlarged, Stacked Liquid Glass UI Clock (Fixed Font Intersections) */
+        /* Enlarged, Stacked Liquid Glass UI Clock */
         .wake-clock {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'MiSans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             font-size: clamp(140px, 42vw, 220px); 
             font-weight: 800; 
             letter-spacing: 2px; 
@@ -190,24 +177,13 @@
             color: transparent;
             -webkit-text-fill-color: transparent;
             
-            /* Sharp, illuminated glass edge */
-            -webkit-text-stroke: 2.5px rgba(255, 255, 255, 0.55);
-            
-            /* Deep ambient shadow pushing the 'glass' forward */
-            text-shadow:
-                0 10px 30px rgba(0, 0, 0, 0.5),
-                0 2px 8px rgba(0, 0, 0, 0.3);
+            /* CSS Stroke & Shadows removed: handled cleanly by the #glass-stroke SVG filter on the parent panel */
         }
 
-        /* Forces hours and minutes onto separate blocks */
         .wake-clock span {
             display: block;
         }
 
-        /* Bottom quick-action row, pushed down near the very bottom edge and
-           out toward the corners like a real ambient/lock screen, sharing the
-           same frosted-glass circle language as the PIN keypad (.key) elsewhere
-           in the app. Always visible alongside the rest of the ambient screen. */
         .wake-bottom-icons {
             position: absolute;
             left: 0;
@@ -262,11 +238,6 @@
             margin-top: 20px;
         }
 
-        /* Invisible double-tap zone sitting in the gap between the PIN dots
-           and the keypad. Absolutely positioned off the bottom of the header
-           so it never participates in the flex layout above -- existing
-           spacing/alignment of the lock screen is untouched. Double-tapping
-           it shows the pitch-black blackout screen. */
         .blackout-touch-zone {
             position: absolute;
             top: 100%;
@@ -722,6 +693,24 @@
     </style>
 </head>
 <body>
+
+    <!-- SVG Rendering Filter to solve font internal overlapping paths -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position: absolute; pointer-events: none;" aria-hidden="true">
+        <filter id="glass-stroke" x="-20%" y="-20%" width="140%" height="140%">
+            <!-- Dilates the flattened alpha mask (ignoring internal overlapping paths) -->
+            <feMorphology in="SourceAlpha" operator="dilate" radius="2" result="expanded" />
+            <!-- Cuts out the original mask from the dilated mask to create a clean external ring -->
+            <feComposite in="expanded" in2="SourceAlpha" operator="out" result="stroke_alpha" />
+            <!-- Colors the new outer ring -->
+            <feFlood flood-color="rgba(255, 255, 255, 0.55)" result="stroke_color" />
+            <feComposite in="stroke_color" in2="stroke_alpha" operator="in" result="stroke" />
+            <!-- Merges the solid outer ring with the original transparent gradient text -->
+            <feMerge>
+                <feMergeNode in="stroke" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+    </svg>
 
     <div id="wake-screen" class="view hidden">
         <div class="wake-content" id="wake-content">
